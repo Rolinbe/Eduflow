@@ -13,12 +13,9 @@ const niveauLabels: Record<string, string> = {
   SECONDE: 'Seconde', PREMIERE: 'Première', TERMINALE: 'Terminale',
 };
 
-const niveauValues = ['SIXIEME', 'CINQUIEME', 'QUATRIEME', 'TROISIEME', 'SECONDE', 'PREMIERE', 'TERMINALE'] as const;
-
 export default function CourseCatalogPage() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [niveauFilter, setNiveauFilter] = useState('');
   const queryClient = useQueryClient();
 
   const { data: categories } = useQuery({
@@ -42,12 +39,11 @@ export default function CourseCatalogPage() {
   );
 
   const { data: courses, isLoading } = useQuery({
-    queryKey: ['student-catalog', search, categoryFilter, niveauFilter],
+    queryKey: ['student-catalog', search, categoryFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
       if (categoryFilter) params.set('category', categoryFilter);
-      if (niveauFilter) params.set('niveau', niveauFilter);
       const res = await api.get(`/apprenant/cours?${params.toString()}`);
       return res.data.courses || res.data;
     },
@@ -84,16 +80,6 @@ export default function CourseCatalogPage() {
           <option value="">Toutes les catégories</option>
           {categories?.map((cat: any) => (
             <option key={cat.id} value={cat.id}>{cat.name}</option>
-          ))}
-        </select>
-        <select
-          value={niveauFilter}
-          onChange={(e) => setNiveauFilter(e.target.value)}
-          className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
-        >
-          <option value="">Tous les niveaux</option>
-          {niveauValues.map((n) => (
-            <option key={n} value={n}>{niveauLabels[n]}</option>
           ))}
         </select>
       </div>

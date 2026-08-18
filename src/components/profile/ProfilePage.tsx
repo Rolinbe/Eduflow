@@ -8,6 +8,11 @@ import { useAuthStore } from '../../stores/authStore';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
+const niveauLabels: Record<string, string> = {
+  SIXIEME: '6ème', CINQUIEME: '5ème', QUATRIEME: '4ème', TROISIEME: '3ème',
+  SECONDE: 'Seconde', PREMIERE: 'Première', TERMINALE: 'Terminale',
+};
+
 const profileSchema = z.object({
   firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
   lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
@@ -293,6 +298,17 @@ export default function ProfilePage() {
             <span className="text-sm text-gray-500">Statut</span>
             <span className="text-sm font-medium text-green-600">Actif</span>
           </div>
+          {meData?.user?.niveau && (
+            <div className="flex items-center justify-between py-2 border-b border-gray-50">
+              <span className="text-sm text-gray-500">Niveau</span>
+              <span className="text-sm font-medium text-gray-900">
+                {niveauLabels[meData.user.niveau] || meData.user.niveau}
+                {meData.user.niveau === 'TERMINALE' || meData.user.niveau === 'PREMIERE'
+                  ? meData.user.serie ? ` — Série ${meData.user.serie}` : ''
+                  : ''}
+              </span>
+            </div>
+          )}
           <div className="flex items-center justify-between py-2 border-b border-gray-50">
             <span className="text-sm text-gray-500">Membre depuis</span>
             <span className="text-sm font-medium text-gray-900">

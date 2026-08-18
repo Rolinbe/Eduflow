@@ -76,8 +76,6 @@ export default function CourseForm({ initialData, categories, onSubmit, onClose,
     }
     if ((data.niveau === 'TERMINALE' || data.niveau === 'PREMIERE') && data.serie) {
       payload.serie = data.serie;
-    } else {
-      payload.serie = null;
     }
     onSubmit(payload);
   };

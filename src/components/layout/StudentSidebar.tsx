@@ -1,5 +1,4 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
 import { useAuth } from '../../hooks/useAuth';
 
 const menuItems = [
@@ -12,7 +11,6 @@ const menuItems = [
 
 export default function StudentSidebar() {
   const location = useLocation();
-  const { user } = useAuthStore();
   const { handleLogout } = useAuth();
 
   return (
@@ -52,27 +50,9 @@ export default function StudentSidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-100">
-        <Link
-          to="/student/profile"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <div className="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-            {user?.avatar ? (
-              <img src={user.avatar} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-sm font-semibold text-primary-700">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </span>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{user?.firstName} {user?.lastName}</p>
-            <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-          </div>
-        </Link>
         <button
           onClick={handleLogout}
-          className="w-full mt-2 flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-danger transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-danger transition-colors"
         >
           <span className="material-symbols-outlined text-xl">logout</span>
           Déconnexion
