@@ -138,7 +138,7 @@ export interface Like {
 export interface Notification {
   id: number;
   userId: number;
-  type: 'INFO' | 'SUCCES' | 'WARNING' | 'ERROR' | 'CERTIFICAT';
+  type: 'INFO' | 'SUCCES' | 'WARNING' | 'ERROR' | 'CERTIFICAT' | 'ANNONCE';
   title: string;
   message: string;
   isRead: boolean;
@@ -202,5 +202,15 @@ export interface Conversation {
   otherUser: User;
   lastMessage?: ChatMessage | null;
   unreadCount: number;
+  updatedAt: string;
+}
+
+export interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+  adminId: number;
+  admin?: { id: number; firstName: string; lastName: string };
+  createdAt: string;
   updatedAt: string;
 }

@@ -30,6 +30,15 @@ export default {
       boxShadow: {
         card: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
       },
+      keyframes: {
+        'slide-down': {
+          '0%': { opacity: '0', transform: 'translateY(-8px) scale(0.98)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+      },
+      animation: {
+        'slide-down': 'slide-down 0.3s ease-out',
+      },
     },
   },
   plugins: [],

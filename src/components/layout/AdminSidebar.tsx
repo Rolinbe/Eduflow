@@ -6,6 +6,7 @@ const menuItems = [
   { path: '/admin', label: 'Tableau de bord', icon: 'dashboard' },
   { path: '/admin/courses', label: 'Gestion des cours', icon: 'school' },
   { path: '/admin/users', label: 'Gestion des utilisateurs', icon: 'people' },
+  { path: '/admin/announcements', label: 'Annonces', icon: 'campaign' },
   { path: '/admin/chat', label: 'Messagerie', icon: 'chat' },
 ];
 

@@ -11,6 +11,7 @@ import CourseManagementPage from './pages/admin/CourseManagementPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 import AdminChatPage from './pages/admin/AdminChatPage';
 import AdminProfilePage from './pages/admin/AdminProfilePage';
+import AdminAnnouncementsPage from './pages/admin/AdminAnnouncementsPage';
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import CourseCatalogPage from './pages/student/CourseCatalogPage';
 import MyCoursesPage from './pages/student/MyCoursesPage';
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/admin/courses" element={<ProtectedRoute role="ADMIN"><CourseManagementPage /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute role="ADMIN"><UserManagementPage /></ProtectedRoute>} />
       <Route path="/admin/chat" element={<ProtectedRoute role="ADMIN"><AdminChatPage /></ProtectedRoute>} />
+      <Route path="/admin/announcements" element={<ProtectedRoute role="ADMIN"><AdminAnnouncementsPage /></ProtectedRoute>} />
       <Route path="/admin/profile" element={<ProtectedRoute role="ADMIN"><AdminProfilePage /></ProtectedRoute>} />
 
       <Route path="/student" element={<ProtectedRoute role="APPRENANT"><StudentDashboardPage /></ProtectedRoute>} />
