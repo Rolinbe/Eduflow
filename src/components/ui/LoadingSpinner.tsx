@@ -13,7 +13,7 @@ export default function LoadingSpinner({ size = 'md', className = '' }: LoadingS
   return (
     <div className={`flex items-center justify-center ${className}`}>
       <div
-        className={`${sizeClasses[size]} border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin`}
+        className={`${sizeClasses[size]} border-4 border-gray-200 dark:border-dark-600 border-t-primary-500 rounded-full animate-spin transition-colors duration-200`}
       />
     </div>
   );

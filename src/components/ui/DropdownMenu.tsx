@@ -40,17 +40,17 @@ export default function DropdownMenu({ trigger, items }: DropdownMenuProps) {
   }, [isOpen]);
 
   const variantClasses: Record<string, string> = {
-    default: 'text-gray-700 hover:bg-gray-100',
-    danger: 'text-red-600 hover:bg-red-50',
-    success: 'text-green-600 hover:bg-green-50',
-    warning: 'text-yellow-600 hover:bg-yellow-50',
+    default: 'text-gray-700 dark:text-dark-200 hover:bg-gray-100 dark:hover:bg-dark-700',
+    danger: 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30',
+    success: 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30',
+    warning: 'text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30',
   };
 
   return (
     <div className="relative" ref={menuRef}>
       <div onClick={() => setIsOpen(!isOpen)}>
         {trigger || (
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+          <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 text-gray-400 dark:text-dark-400 hover:text-gray-600 dark:hover:text-dark-200 transition-colors duration-200">
             <span className="material-symbols-outlined text-xl">more_vert</span>
           </button>
         )}
@@ -59,7 +59,7 @@ export default function DropdownMenu({ trigger, items }: DropdownMenuProps) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-1 w-52 bg-white rounded-xl shadow-lg border border-gray-100 z-50 py-1.5 overflow-hidden">
+          <div className="absolute right-0 mt-1 w-52 bg-white dark:bg-dark-800 rounded-xl shadow-lg border border-gray-100 dark:border-dark-600 z-50 py-1.5 overflow-hidden animate-scale-in transition-colors duration-200">
             {items.map((item, index) => (
               item.disabled ? null : (
                 <button
@@ -68,7 +68,7 @@ export default function DropdownMenu({ trigger, items }: DropdownMenuProps) {
                     item.onClick();
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors ${
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${
                     variantClasses[item.variant || 'default']
                   }`}
                 >

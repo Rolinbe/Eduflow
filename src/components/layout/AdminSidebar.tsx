@@ -3,11 +3,11 @@ import { useAuthStore } from '../../stores/authStore';
 import { useAuth } from '../../hooks/useAuth';
 
 const menuItems = [
-  { path: '/admin', label: 'Tableau de bord', icon: 'dashboard' },
-  { path: '/admin/courses', label: 'Gestion des cours', icon: 'school' },
-  { path: '/admin/users', label: 'Gestion des utilisateurs', icon: 'people' },
-  { path: '/admin/announcements', label: 'Annonces', icon: 'campaign' },
-  { path: '/admin/chat', label: 'Messagerie', icon: 'chat' },
+  { path: '/admin', label: 'Tableau de bord', icon: 'dashboard', color: 'text-blue-500' },
+  { path: '/admin/courses', label: 'Gestion des cours', icon: 'school', color: 'text-emerald-500' },
+  { path: '/admin/users', label: 'Utilisateurs', icon: 'people', color: 'text-violet-500' },
+  { path: '/admin/announcements', label: 'Annonces', icon: 'campaign', color: 'text-amber-500' },
+  { path: '/admin/chat', label: 'Messagerie', icon: 'chat', color: 'text-cyan-500' },
 ];
 
 interface AdminSidebarProps {
@@ -24,26 +24,31 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={onClose}
         />
       )}
-      <aside className={`w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 flex flex-col z-50 transition-transform duration-200 ${
+      <aside className={`w-64 bg-white dark:bg-dark-900 border-r border-gray-100 dark:border-dark-700 h-screen fixed left-0 top-0 flex flex-col z-50 transition-all duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
-        <div className="p-6 border-b border-gray-100">
-          <Link to="/admin" className="flex items-center gap-3" onClick={onClose}>
-            <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
-              <span className="material-symbols-outlined text-white">school</span>
+        {/* Logo */}
+        <div className="p-5 border-b border-gray-100 dark:border-dark-700">
+          <Link to="/admin" className="flex items-center gap-3 group" onClick={onClose}>
+            <div className="w-11 h-11 bg-gradient-to-br from-primary-500 via-primary-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-all duration-300 group-hover:scale-105">
+              <span className="material-symbols-outlined text-white text-2xl">school</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">EduFlow</h1>
-              <p className="text-xs text-gray-400">Administration</p>
+              <h1 className="text-lg font-extrabold bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">
+                EduFlow
+              </h1>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-dark-400">Administration</p>
             </div>
           </Link>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        {/* Navigation */}
+        <nav className="flex-1 p-3 space-y-1 mt-2">
+          <p className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-dark-500">Menu principal</p>
           {menuItems.map((item) => {
             const isActive = item.path === '/admin'
               ? location.pathname === '/admin'
@@ -53,42 +58,48 @@ export default function AdminSidebar({ isOpen = false, onClose }: AdminSidebarPr
                 key={item.path}
                 to={item.path}
                 onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                   isActive
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/30 dark:to-indigo-900/20 text-primary-700 dark:text-primary-300 shadow-sm ring-1 ring-primary-100 dark:ring-primary-800/30'
+                    : 'text-gray-600 dark:text-dark-300 hover:bg-gray-50 dark:hover:bg-dark-800 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <span className="material-symbols-outlined text-xl">{item.icon}</span>
+                <span className={`material-symbols-outlined text-xl transition-all duration-200 ${isActive ? item.color : 'text-gray-400 dark:text-dark-500 group-hover:' + item.color}`}>
+                  {item.icon}
+                </span>
                 {item.label}
+                {isActive && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
+                )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-100">
+        {/* User profile + Logout */}
+        <div className="p-3 border-t border-gray-100 dark:border-dark-700 space-y-1">
           <Link
             to="/admin/profile"
-            className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-dark-800 transition-all duration-200"
             onClick={onClose}
           >
-            <div className="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-indigo-500 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
               {user?.avatar ? (
                 <img src={user.avatar} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-sm font-semibold text-primary-700">
+                <span className="text-sm font-bold text-white">
                   {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </span>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user?.firstName} {user?.lastName}</p>
-              <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user?.firstName} {user?.lastName}</p>
+              <p className="text-xs text-gray-400 dark:text-dark-400 truncate">{user?.email}</p>
             </div>
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full mt-2 flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-danger transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 dark:text-dark-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200"
           >
             <span className="material-symbols-outlined text-xl">logout</span>
             Déconnexion

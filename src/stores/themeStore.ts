@@ -1,0 +1,31 @@
+import { create } from 'zustand';
+
+interface ThemeStore {
+  isDark: boolean;
+  toggle: () => void;
+  setDark: (dark: boolean) => void;
+}
+
+export const useThemeStore = create<ThemeStore>((set) => ({
+  isDark: localStorage.getItem('eduflow-dark') === 'true',
+  toggle: () =>
+    set((state) => {
+      const next = !state.isDark;
+      localStorage.setItem('eduflow-dark', String(next));
+      if (next) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      return { isDark: next };
+    }),
+  setDark: (dark: boolean) => {
+    localStorage.setItem('eduflow-dark', String(dark));
+    if (dark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    set({ isDark: dark });
+  },
+}));

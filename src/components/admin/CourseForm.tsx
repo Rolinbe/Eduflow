@@ -80,24 +80,27 @@ export default function CourseForm({ initialData, categories, onSubmit, onClose,
     onSubmit(payload);
   };
 
+  const inputClass = "w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm bg-white dark:bg-dark-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200";
+  const labelClass = "block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1 transition-colors duration-200";
+
   return (
     <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+        <label className={labelClass}>Titre</label>
         <input
           {...register('title')}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className={inputClass}
           placeholder="Titre du cours"
         />
         {errors.title && <p className="text-xs text-danger mt-1">{errors.title.message}</p>}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label className={labelClass}>Description</label>
         <textarea
           {...register('description')}
           rows={3}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className={`${inputClass} resize-none`}
           placeholder="Description du cours (optionnel)"
         />
         {errors.description && <p className="text-xs text-danger mt-1">{errors.description.message}</p>}
@@ -105,10 +108,10 @@ export default function CourseForm({ initialData, categories, onSubmit, onClose,
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+          <label className={labelClass}>Catégorie</label>
           <select
             {...register('categoryId')}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className={inputClass}
           >
             <option value="">Sélectionner</option>
             {categories.map((cat) => (
@@ -118,10 +121,10 @@ export default function CourseForm({ initialData, categories, onSubmit, onClose,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+          <label className={labelClass}>Statut</label>
           <select
             {...register('status')}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className={inputClass}
           >
             <option value="BROUILLON">Brouillon</option>
             <option value="PUBLIE">Publié</option>
@@ -132,10 +135,10 @@ export default function CourseForm({ initialData, categories, onSubmit, onClose,
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Niveau</label>
+          <label className={labelClass}>Niveau</label>
           <select
             {...register('niveau')}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className={inputClass}
           >
             <option value="">Tous les niveaux</option>
             {niveauValues.map((n) => (
@@ -146,10 +149,10 @@ export default function CourseForm({ initialData, categories, onSubmit, onClose,
 
         {(selectedNiveau === 'TERMINALE' || selectedNiveau === 'PREMIERE') && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Série</label>
+            <label className={labelClass}>Série</label>
             <select
               {...register('serie')}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className={inputClass}
             >
               <option value="">Toutes les séries</option>
               {serieValues.map((s) => (
@@ -160,18 +163,18 @@ export default function CourseForm({ initialData, categories, onSubmit, onClose,
         )}
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-dark-700 transition-colors duration-200">
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-dark-300 bg-gray-100 dark:bg-dark-700 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-600 transition-all duration-200"
         >
           Annuler
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+          className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 hover:shadow-lg hover:shadow-primary-500/25 active:scale-[0.98]"
         >
           {isLoading ? 'Enregistrement...' : initialData?.id ? 'Modifier' : 'Créer'}
         </button>

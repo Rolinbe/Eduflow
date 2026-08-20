@@ -127,14 +127,17 @@ export default function ProfilePage() {
 
   if (isLoading) return <LoadingSpinner className="py-12" />;
 
+  const inputClass = "w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm bg-white dark:bg-dark-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200";
+  const labelClass = "block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1 transition-colors duration-200";
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Avatar Section */}
-      <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-6">Photo de profil</h2>
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-card p-6 transition-colors duration-200">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-200">Photo de profil</h2>
         <div className="flex items-center gap-6">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center border-4 border-white shadow-md">
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center border-4 border-white dark:border-dark-800 shadow-md transition-colors duration-200">
               {currentAvatar ? (
                 <img src={currentAvatar} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
@@ -145,17 +148,17 @@ export default function ProfilePage() {
             </div>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-600 transition-colors"
+              className="absolute bottom-0 right-0 w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-primary-600 transition-all duration-200 hover:scale-110 active:scale-95"
             >
               <span className="material-symbols-outlined text-lg">photo_camera</span>
             </button>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">{meData?.user?.firstName} {meData?.user?.lastName}</p>
-            <p className="text-xs text-gray-500">{meData?.user?.email}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">{meData?.user?.firstName} {meData?.user?.lastName}</p>
+            <p className="text-xs text-gray-500 dark:text-dark-400 transition-colors duration-200">{meData?.user?.email}</p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="mt-2 text-sm text-primary-500 hover:text-primary-600 font-medium"
+              className="mt-2 text-sm text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200"
             >
               Changer la photo
             </button>
@@ -174,25 +177,25 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Form */}
-      <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-6">Informations personnelles</h2>
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-card p-6 transition-colors duration-200">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-200">Informations personnelles</h2>
         <form onSubmit={profileForm.handleSubmit((data) => updateProfileMutation.mutate(data))} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+              <label className={labelClass}>Prénom</label>
               <input
                 {...profileForm.register('firstName')}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className={inputClass}
               />
               {profileForm.formState.errors.firstName && (
                 <p className="text-xs text-red-500 mt-1">{profileForm.formState.errors.firstName.message}</p>
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+              <label className={labelClass}>Nom</label>
               <input
                 {...profileForm.register('lastName')}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className={inputClass}
               />
               {profileForm.formState.errors.lastName && (
                 <p className="text-xs text-red-500 mt-1">{profileForm.formState.errors.lastName.message}</p>
@@ -200,19 +203,19 @@ export default function ProfilePage() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className={labelClass}>Email</label>
             <input
               value={meData?.user?.email || ''}
               disabled
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 cursor-not-allowed"
+              className={`${inputClass} bg-gray-50 dark:bg-dark-900 text-gray-500 dark:text-dark-400 cursor-not-allowed`}
             />
-            <p className="text-xs text-gray-400 mt-1">L'email ne peut pas être modifié</p>
+            <p className="text-xs text-gray-400 dark:text-dark-400 mt-1 transition-colors duration-200">L'email ne peut pas être modifié</p>
           </div>
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={updateProfileMutation.isPending || (!profileForm.formState.isDirty && !selectedFile)}
-              className="px-6 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+              className="px-6 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 hover:shadow-lg hover:shadow-primary-500/25 active:scale-[0.98]"
             >
               {updateProfileMutation.isPending ? 'Enregistrement...' : 'Enregistrer'}
             </button>
@@ -221,12 +224,12 @@ export default function ProfilePage() {
       </div>
 
       {/* Password Section */}
-      <div className="bg-white rounded-xl shadow-card p-6">
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-card p-6 transition-colors duration-200">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold text-gray-900">Mot de passe</h2>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white transition-colors duration-200">Mot de passe</h2>
           <button
             onClick={() => setShowPasswordSection(!showPasswordSection)}
-            className="text-sm text-primary-500 hover:text-primary-600 font-medium"
+            className="text-sm text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200"
           >
             {showPasswordSection ? 'Annuler' : 'Modifier'}
           </button>
@@ -235,11 +238,11 @@ export default function ProfilePage() {
         {showPasswordSection ? (
           <form onSubmit={passwordForm.handleSubmit((data) => changePasswordMutation.mutate(data))} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel</label>
+              <label className={labelClass}>Mot de passe actuel</label>
               <input
                 type="password"
                 {...passwordForm.register('oldPassword')}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className={inputClass}
               />
               {passwordForm.formState.errors.oldPassword && (
                 <p className="text-xs text-red-500 mt-1">{passwordForm.formState.errors.oldPassword.message}</p>
@@ -247,22 +250,22 @@ export default function ProfilePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
+                <label className={labelClass}>Nouveau mot de passe</label>
                 <input
                   type="password"
                   {...passwordForm.register('newPassword')}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className={inputClass}
                 />
                 {passwordForm.formState.errors.newPassword && (
                   <p className="text-xs text-red-500 mt-1">{passwordForm.formState.errors.newPassword.message}</p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Confirmer</label>
+                <label className={labelClass}>Confirmer</label>
                 <input
                   type="password"
                   {...passwordForm.register('confirmPassword')}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className={inputClass}
                 />
                 {passwordForm.formState.errors.confirmPassword && (
                   <p className="text-xs text-red-500 mt-1">{passwordForm.formState.errors.confirmPassword.message}</p>
@@ -273,35 +276,35 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={changePasswordMutation.isPending}
-                className="px-6 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+                className="px-6 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 hover:shadow-lg hover:shadow-primary-500/25 active:scale-[0.98]"
               >
                 {changePasswordMutation.isPending ? 'Modification...' : 'Modifier le mot de passe'}
               </button>
             </div>
           </form>
         ) : (
-          <p className="text-sm text-gray-500">••••••••••</p>
+          <p className="text-sm text-gray-500 dark:text-dark-400 transition-colors duration-200">••••••••••</p>
         )}
       </div>
 
       {/* Account Info */}
-      <div className="bg-white rounded-xl shadow-card p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Informations du compte</h2>
+      <div className="bg-white dark:bg-dark-800 rounded-xl shadow-card p-6 transition-colors duration-200">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-200">Informations du compte</h2>
         <div className="space-y-3">
-          <div className="flex items-center justify-between py-2 border-b border-gray-50">
-            <span className="text-sm text-gray-500">Rôle</span>
-            <span className="text-sm font-medium text-gray-900">
+          <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-dark-700 transition-colors duration-200">
+            <span className="text-sm text-gray-500 dark:text-dark-400 transition-colors duration-200">Rôle</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">
               {user?.role === 'ADMIN' ? 'Administrateur' : 'Apprenant'}
             </span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-gray-50">
-            <span className="text-sm text-gray-500">Statut</span>
+          <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-dark-700 transition-colors duration-200">
+            <span className="text-sm text-gray-500 dark:text-dark-400 transition-colors duration-200">Statut</span>
             <span className="text-sm font-medium text-green-600">Actif</span>
           </div>
           {meData?.user?.niveau && (
-            <div className="flex items-center justify-between py-2 border-b border-gray-50">
-              <span className="text-sm text-gray-500">Niveau</span>
-              <span className="text-sm font-medium text-gray-900">
+            <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-dark-700 transition-colors duration-200">
+              <span className="text-sm text-gray-500 dark:text-dark-400 transition-colors duration-200">Niveau</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">
                 {niveauLabels[meData.user.niveau] || meData.user.niveau}
                 {meData.user.niveau === 'TERMINALE' || meData.user.niveau === 'PREMIERE'
                   ? meData.user.serie ? ` — Série ${meData.user.serie}` : ''
@@ -309,9 +312,9 @@ export default function ProfilePage() {
               </span>
             </div>
           )}
-          <div className="flex items-center justify-between py-2 border-b border-gray-50">
-            <span className="text-sm text-gray-500">Membre depuis</span>
-            <span className="text-sm font-medium text-gray-900">
+          <div className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-dark-700 transition-colors duration-200">
+            <span className="text-sm text-gray-500 dark:text-dark-400 transition-colors duration-200">Membre depuis</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">
               {new Date(meData?.user?.createdAt || '').toLocaleDateString('fr-FR', {
                 year: 'numeric',
                 month: 'long',
@@ -320,8 +323,8 @@ export default function ProfilePage() {
             </span>
           </div>
           <div className="flex items-center justify-between py-2">
-            <span className="text-sm text-gray-500">Dernière connexion</span>
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm text-gray-500 dark:text-dark-400 transition-colors duration-200">Dernière connexion</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-white transition-colors duration-200">
               {meData?.user?.lastLogin
                 ? new Date(meData.user.lastLogin).toLocaleDateString('fr-FR', {
                     year: 'numeric',

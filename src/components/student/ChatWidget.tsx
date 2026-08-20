@@ -181,12 +181,12 @@ export default function ChatWidget() {
 
       <div className="fixed bottom-6 right-6 z-50">
         {isOpen ? (
-          <div className="w-[380px] h-[560px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
+          <div className="w-[380px] h-[560px] bg-white dark:bg-dark-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-dark-600 flex flex-col overflow-hidden transition-colors duration-300">
             <div className="bg-primary-500 text-white p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {activeConversationId ? (
                   <>
-                    <button onClick={() => setActiveConversationId(null)} className="hover:bg-white/20 rounded-full p-1">
+                    <button onClick={() => setActiveConversationId(null)} className="hover:bg-white/20 rounded-full p-1 transition-colors duration-200">
                       <span className="material-symbols-outlined">arrow_back</span>
                     </button>
                     <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
@@ -215,12 +215,12 @@ export default function ChatWidget() {
                       setActiveTab('call');
                       setCallState({ isActive: true, isIncoming: false, targetUserId: activeConv?.otherUser?.id, targetUserName: `${activeConv?.otherUser?.firstName} ${activeConv?.otherUser?.lastName}` });
                     }}
-                    className="hover:bg-white/20 rounded-full p-2"
+                    className="hover:bg-white/20 rounded-full p-2 transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined">call</span>
                   </button>
                 )}
-                <button onClick={() => { setIsOpen(false); setActiveConversationId(null); }} className="hover:bg-white/20 rounded-full p-2">
+                <button onClick={() => { setIsOpen(false); setActiveConversationId(null); }} className="hover:bg-white/20 rounded-full p-2 transition-colors duration-200">
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
@@ -234,7 +234,7 @@ export default function ChatWidget() {
                       <button
                         key={conv.id}
                         onClick={() => selectConversation(conv.id)}
-                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors text-left"
+                        className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-dark-700 transition-all duration-200 text-left"
                       >
                         <div className="relative">
                           <div className="w-11 h-11 bg-primary-100 rounded-full flex items-center justify-center">
@@ -243,12 +243,12 @@ export default function ChatWidget() {
                             </span>
                           </div>
                           {onlineUsers.has(conv.otherUser?.id || 0) && (
-                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-800" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-gray-900 truncate">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                               {conv.otherUser?.firstName} {conv.otherUser?.lastName}
                             </p>
                             {conv.unreadCount > 0 && (
@@ -257,7 +257,7 @@ export default function ChatWidget() {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-500 truncate mt-0.5">
+                          <p className="text-xs text-gray-500 dark:text-dark-400 truncate mt-0.5">
                             {conv.lastMessage?.content || 'Pas de message'}
                           </p>
                         </div>
@@ -265,8 +265,8 @@ export default function ChatWidget() {
                     ))
                   ) : (
                     <div className="p-8 text-center">
-                      <span className="material-symbols-outlined text-4xl text-gray-300">forum</span>
-                      <p className="text-sm text-gray-500 mt-2">Aucune conversation</p>
+                      <span className="material-symbols-outlined text-4xl text-gray-300 dark:text-dark-500">forum</span>
+                      <p className="text-sm text-gray-500 dark:text-dark-400 mt-2">Aucune conversation</p>
                     </div>
                   )}
                 </div>
@@ -280,10 +280,10 @@ export default function ChatWidget() {
                           <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl ${
                             isMine
                               ? 'bg-primary-500 text-white rounded-br-md'
-                              : 'bg-gray-100 text-gray-900 rounded-bl-md'
+                              : 'bg-gray-100 dark:bg-dark-700 text-gray-900 dark:text-white rounded-bl-md'
                           }`}>
                             <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                            <p className={`text-[10px] mt-1 ${isMine ? 'text-white/60' : 'text-gray-400'}`}>
+                            <p className={`text-[10px] mt-1 ${isMine ? 'text-white/60' : 'text-gray-400 dark:text-dark-400'}`}>
                               {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
@@ -293,7 +293,7 @@ export default function ChatWidget() {
                     <div ref={messagesEndRef} />
                   </div>
 
-                  <div className="p-3 border-t border-gray-100">
+                  <div className="p-3 border-t border-gray-100 dark:border-dark-700">
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
@@ -301,12 +301,12 @@ export default function ChatWidget() {
                         onChange={(e) => { setInputValue(e.target.value); handleTyping(); }}
                         onKeyDown={handleKeyDown}
                         placeholder="Écrire un message..."
-                        className="flex-1 px-4 py-2.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-dark-800 dark:text-white dark:border-dark-600 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors duration-200"
                       />
                       <button
                         onClick={sendMessage}
                         disabled={!inputValue.trim()}
-                        className="w-10 h-10 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors disabled:opacity-50"
+                        className="w-10 h-10 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-600 transition-all duration-200 disabled:opacity-50 hover:scale-105"
                       >
                         <span className="material-symbols-outlined text-xl">send</span>
                       </button>
@@ -319,7 +319,7 @@ export default function ChatWidget() {
         ) : (
           <button
             onClick={() => setIsOpen(true)}
-            className="relative w-14 h-14 bg-primary-500 text-white rounded-full shadow-lg hover:bg-primary-600 transition-all flex items-center justify-center"
+            className="relative w-14 h-14 bg-primary-500 text-white rounded-full shadow-lg hover:bg-primary-600 transition-all duration-300 flex items-center justify-center hover:scale-110 dark:shadow-primary-500/30 dark:shadow-lg hover:shadow-xl"
           >
             <span className="material-symbols-outlined text-2xl">chat</span>
             {totalUnread > 0 && (

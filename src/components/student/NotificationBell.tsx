@@ -72,9 +72,9 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => { setIsOpen(!isOpen); setExpandedId(null); }}
-        className="relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+        className="relative w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors duration-200"
       >
-        <span className="material-symbols-outlined text-gray-500">notifications</span>
+        <span className="material-symbols-outlined text-gray-500 dark:text-dark-400">notifications</span>
         {unreadCount > 0 && (
           <span className="absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -84,15 +84,15 @@ export default function NotificationBell() {
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px]" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 top-12 w-96 bg-white/80 backdrop-blur-xl rounded-xl shadow-2xl border border-white/40 z-50 max-h-[32rem] overflow-hidden flex flex-col animate-slide-down">
+          <div className="fixed inset-0 z-40 bg-black/10 dark:bg-black/30 backdrop-blur-[1px]" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 top-12 w-96 bg-white/80 dark:bg-dark-800/80 backdrop-blur-xl dark:backdrop-blur-xl rounded-xl shadow-2xl border border-white/40 dark:border-dark-600/40 z-50 max-h-[32rem] overflow-hidden flex flex-col animate-slide-down transition-colors duration-300">
             {/* Header */}
-            <div className="p-4 border-b border-white/30 flex items-center justify-between flex-shrink-0">
-              <h3 className="text-sm font-bold text-gray-900">Notifications</h3>
+            <div className="p-4 border-b border-white/30 dark:border-dark-600/40 flex items-center justify-between flex-shrink-0">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white">Notifications</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={() => markAllReadMutation.mutate()}
-                  className="text-xs text-primary-500 hover:text-primary-600 font-medium"
+                  className="text-xs text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200"
                 >
                   Tout marquer comme lu
                 </button>
@@ -102,7 +102,7 @@ export default function NotificationBell() {
             {/* Liste */}
             <div className="overflow-y-auto flex-1">
               {notifications.length > 0 ? (
-                <div className="divide-y divide-white/30">
+                <div className="divide-y divide-white/30 dark:divide-dark-600/40">
                   {notifications.map((notif) => {
                     const expanded = expandedId === notif.id;
                     const hasLongMessage = notif.message.length > 120;
@@ -114,32 +114,32 @@ export default function NotificationBell() {
                           if (!notif.isRead) markReadMutation.mutate(notif.id);
                           if (hasLongMessage) setExpandedId(expanded ? null : notif.id);
                         }}
-                        className={`p-4 cursor-pointer transition-colors ${
+                        className={`p-4 cursor-pointer transition-all duration-200 ${
                           !notif.isRead
                             ? isAnnouncement(notif.type)
-                              ? 'bg-red-50 hover:bg-red-100/70'
-                              : 'bg-blue-50/60 hover:bg-blue-50'
-                            : 'hover:bg-gray-50'
+                              ? 'bg-red-50 dark:bg-red-500/10 hover:bg-red-100/70 dark:hover:bg-red-500/20'
+                              : 'bg-blue-50/60 dark:bg-primary-500/10 hover:bg-blue-50 dark:hover:bg-primary-500/20'
+                            : 'hover:bg-gray-50 dark:hover:bg-dark-700'
                         }`}
                       >
                         <div className="flex items-start gap-3">
                           {/* Icone */}
                           <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
                             isAnnouncement(notif.type)
-                              ? 'bg-red-100'
-                              : notif.type === 'SUCCES' ? 'bg-green-100'
-                              : notif.type === 'WARNING' ? 'bg-yellow-100'
-                              : notif.type === 'CERTIFICAT' ? 'bg-purple-100'
-                              : notif.type === 'ERROR' ? 'bg-red-100'
-                              : 'bg-blue-100'
+                              ? 'bg-red-100 dark:bg-red-500/20'
+                              : notif.type === 'SUCCES' ? 'bg-green-100 dark:bg-green-500/20'
+                              : notif.type === 'WARNING' ? 'bg-yellow-100 dark:bg-yellow-500/20'
+                              : notif.type === 'CERTIFICAT' ? 'bg-purple-100 dark:bg-purple-500/20'
+                              : notif.type === 'ERROR' ? 'bg-red-100 dark:bg-red-500/20'
+                              : 'bg-blue-100 dark:bg-blue-500/20'
                           }`}>
                             <span className={`material-symbols-outlined text-xl ${
-                              isAnnouncement(notif.type) ? 'text-red-600' :
-                              notif.type === 'SUCCES' ? 'text-green-600' :
-                              notif.type === 'WARNING' ? 'text-yellow-600' :
-                              notif.type === 'CERTIFICAT' ? 'text-purple-600' :
-                              notif.type === 'ERROR' ? 'text-red-600' :
-                              'text-blue-600'
+                              isAnnouncement(notif.type) ? 'text-red-600 dark:text-red-400' :
+                              notif.type === 'SUCCES' ? 'text-green-600 dark:text-green-400' :
+                              notif.type === 'WARNING' ? 'text-yellow-600 dark:text-yellow-400' :
+                              notif.type === 'CERTIFICAT' ? 'text-purple-600 dark:text-purple-400' :
+                              notif.type === 'ERROR' ? 'text-red-600 dark:text-red-400' :
+                              'text-blue-600 dark:text-blue-400'
                             }`}>
                               {getIcon(notif.type)}
                             </span>
@@ -148,24 +148,24 @@ export default function NotificationBell() {
                           {/* Contenu */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <p className="text-sm font-semibold text-gray-900 leading-tight">{notif.title}</p>
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{notif.title}</p>
                               {isAnnouncement(notif.type) && (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 flex-shrink-0">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 flex-shrink-0">
                                   ANNONCE
                                 </span>
                               )}
                             </div>
-                            <p className={`text-sm text-gray-600 leading-relaxed whitespace-pre-wrap ${
+                            <p className={`text-sm text-gray-600 dark:text-dark-300 leading-relaxed whitespace-pre-wrap ${
                               !expanded && hasLongMessage ? 'line-clamp-3' : ''
                             }`}>
                               {notif.message}
                             </p>
                             {hasLongMessage && (
-                              <button className="text-xs text-primary-500 hover:text-primary-600 font-medium mt-1">
+                              <button className="text-xs text-primary-500 hover:text-primary-600 font-medium mt-1 transition-colors duration-200">
                                 {expanded ? 'Voir moins' : 'Voir plus'}
                               </button>
                             )}
-                            <p className="text-xs text-gray-400 mt-2">
+                            <p className="text-xs text-gray-400 dark:text-dark-400 mt-2">
                               {timeAgo(notif.createdAt)}
                             </p>
                           </div>
@@ -183,8 +183,8 @@ export default function NotificationBell() {
                 </div>
               ) : (
                 <div className="p-8 text-center">
-                  <span className="material-symbols-outlined text-4xl text-gray-300">notifications_off</span>
-                  <p className="text-sm text-gray-400 mt-3">Aucune notification</p>
+                  <span className="material-symbols-outlined text-4xl text-gray-300 dark:text-dark-500">notifications_off</span>
+                  <p className="text-sm text-gray-400 dark:text-dark-400 mt-3">Aucune notification</p>
                 </div>
               )}
             </div>

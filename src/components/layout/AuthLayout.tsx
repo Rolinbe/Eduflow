@@ -7,7 +7,7 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex transition-colors duration-200">
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-500 to-primary-900 p-12 flex-col justify-between">
         <Link to="/" className="flex items-center gap-3">
           <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
@@ -34,7 +34,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           <p className="text-white/60 text-sm">+1000 apprenants actifs</p>
         </div>
       </div>
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-dark-800 transition-colors duration-200">
         <div className="w-full max-w-md">{children}</div>
       </div>
     </div>

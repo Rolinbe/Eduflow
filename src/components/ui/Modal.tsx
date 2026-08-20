@@ -37,15 +37,15 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative bg-white rounded-lg shadow-xl w-full mx-4 ${sizeClasses[size]} max-h-[90vh] flex flex-col`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200" onClick={onClose} />
+      <div className={`relative bg-white dark:bg-dark-800 rounded-2xl shadow-2xl w-full mx-4 ${sizeClasses[size]} max-h-[90vh] flex flex-col animate-scale-in transition-all duration-200 ring-1 ring-gray-100 dark:ring-dark-700`}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-dark-700 transition-colors duration-200">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-dark-700 transition-all duration-200 active:scale-95"
           >
-            <span className="material-symbols-outlined text-gray-400">close</span>
+            <span className="material-symbols-outlined text-gray-400 dark:text-dark-400">close</span>
           </button>
         </div>
         <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>

@@ -11,6 +11,12 @@
     <title>EduFlow</title>
   </head>
   <body>
+    <script>
+      if (localStorage.getItem('eduflow-dark') === 'true') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#020617';
+      }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

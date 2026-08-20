@@ -24,48 +24,68 @@ export default function EnrollmentChart() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-white rounded-lg shadow-card p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Évolution des inscriptions</h3>
-        <ResponsiveContainer width="100%" height={300}>
+      <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-sm p-6 ring-1 ring-gray-100 dark:ring-dark-700 transition-colors duration-200">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+            <span className="material-symbols-outlined text-white text-xl">trending_up</span>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Inscriptions mensuelles</h3>
+        </div>
+        <ResponsiveContainer width="100%" height={280}>
           <LineChart data={enrollmentData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#9ca3af' }} />
             <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} />
             <Tooltip
               contentStyle={{
-                borderRadius: '8px',
+                borderRadius: '12px',
                 border: 'none',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1)',
+                backgroundColor: 'white',
+                color: '#1e293b',
               }}
             />
             <Line
               type="monotone"
               dataKey="count"
               stroke="#3b82f6"
-              strokeWidth={2}
-              dot={{ fill: '#3b82f6', strokeWidth: 2 }}
-              activeDot={{ r: 6 }}
+              strokeWidth={3}
+              dot={{ fill: '#3b82f6', strokeWidth: 2, r: 5 }}
+              activeDot={{ r: 7, stroke: '#3b82f6', strokeWidth: 2 }}
               name="Inscriptions"
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white rounded-lg shadow-card p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Cours les plus populaires</h3>
-        <ResponsiveContainer width="100%" height={300}>
+      <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-sm p-6 ring-1 ring-gray-100 dark:ring-dark-700 transition-colors duration-200">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25">
+            <span className="material-symbols-outlined text-white text-xl">school</span>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Cours populaires</h3>
+        </div>
+        <ResponsiveContainer width="100%" height={280}>
           <BarChart data={stats?.popularCourses || []}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
             <XAxis dataKey="title" tick={{ fontSize: 12, fill: '#9ca3af' }} width={100} />
             <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} />
             <Tooltip
               contentStyle={{
-                borderRadius: '8px',
+                borderRadius: '12px',
                 border: 'none',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.1)',
+                backgroundColor: 'white',
+                color: '#1e293b',
               }}
             />
-            <Bar dataKey="enrollments" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Inscriptions" />
+            <Bar dataKey="enrollments" fill="url(#emeraldGradient)" radius={[6, 6, 0, 0]} name="Inscriptions" />
+            <defs>
+              <linearGradient id="emeraldGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#10b981" />
+                <stop offset="100%" stopColor="#059669" />
+              </linearGradient>
+            </defs>
           </BarChart>
         </ResponsiveContainer>
       </div>

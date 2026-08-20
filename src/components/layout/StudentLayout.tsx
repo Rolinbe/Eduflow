@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import StudentSidebar from './StudentSidebar';
 import Header from './Header';
@@ -11,7 +10,7 @@ interface StudentLayoutProps {
 
 export default function StudentLayout({ title, children }: StudentLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-950 transition-colors duration-300">
       <StudentSidebar />
       <div className="lg:ml-64">
         <Header title={title} />

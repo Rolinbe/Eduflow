@@ -133,7 +133,7 @@ export default function CourseManagementPage() {
       {/* Level 1: Niveau cards */}
       {!selectedNiveau && (
         <>
-          <p className="text-sm text-gray-500 mb-4">Sélectionnez un niveau pour gérer ses cours</p>
+          <p className="text-sm text-gray-500 dark:text-dark-400 mb-4">Sélectionnez un niveau pour gérer ses cours</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {niveaux.map((n) => {
               const count = coursesByNiveau[n.key]?.length || 0;
@@ -174,12 +174,12 @@ export default function CourseManagementPage() {
         <>
           <button
             onClick={() => setSelectedNiveau(null)}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
+            className="flex items-center gap-2 text-sm text-gray-500 dark:text-dark-400 hover:text-gray-700 dark:hover:text-dark-200 mb-4 transition-colors duration-200"
           >
             <span className="material-symbols-outlined text-lg">arrow_back</span>
             Retour aux niveaux
           </button>
-          <p className="text-sm text-gray-500 mb-4">Sélectionnez une série pour <strong>{niveauLabel}</strong></p>
+          <p className="text-sm text-gray-500 dark:text-dark-400 mb-4">Sélectionnez une série pour <strong>{niveauLabel}</strong></p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {series.map((s) => {
               const count = coursesByNiveau[selectedNiveau]?.filter((c) => c.serie === s.key).length || 0;
@@ -207,13 +207,13 @@ export default function CourseManagementPage() {
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => { setSelectedSerie(null); if (selectedNiveau === 'PREMIERE' || selectedNiveau === 'TERMINALE') setSelectedNiveau(null); else setSelectedNiveau(null); }}
-              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="flex items-center gap-2 text-sm text-gray-500 dark:text-dark-400 hover:text-gray-700 dark:hover:text-dark-200 transition-colors duration-200"
             >
               <span className="material-symbols-outlined text-lg">arrow_back</span>
               Retour
             </button>
-            <div className="h-5 w-px bg-gray-200" />
-            <h2 className="text-lg font-bold text-gray-900">
+            <div className="h-5 w-px bg-gray-200 dark:bg-dark-600" />
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">
               {niveauLabel}
               {serieLabel && <> — {serieLabel}</>}
             </h2>
@@ -223,7 +223,7 @@ export default function CourseManagementPage() {
           <div className="flex justify-end mb-4">
             <button
               onClick={handleCreateClick}
-              className="flex items-center gap-2 px-4 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-all duration-200"
             >
               <span className="material-symbols-outlined text-lg">add</span>
               Nouveau cours
@@ -231,12 +231,12 @@ export default function CourseManagementPage() {
           </div>
 
           {!filteredCourses || filteredCourses.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
-              <span className="material-symbols-outlined text-6xl text-gray-300">school</span>
-              <p className="text-gray-400 mt-3">Aucun cours pour ce niveau{serieLabel ? ` — ${serieLabel}` : ''}</p>
+            <div className="text-center py-16 bg-white dark:bg-dark-800 rounded-xl border border-gray-100 dark:border-dark-700 transition-all duration-200">
+              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-dark-500">school</span>
+              <p className="text-gray-400 dark:text-dark-400 mt-3">Aucun cours pour ce niveau{serieLabel ? ` — ${serieLabel}` : ''}</p>
               <button
                 onClick={handleCreateClick}
-                className="mt-4 px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors"
+                className="mt-4 px-4 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-all duration-200"
               >
                 Créer le premier cours
               </button>
@@ -244,20 +244,20 @@ export default function CourseManagementPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredCourses.map((course) => (
-                <div key={course.id} className="bg-white rounded-xl border border-gray-100 shadow-card overflow-hidden hover:shadow-md transition-shadow">
+                <div key={course.id} className="bg-white dark:bg-dark-800 rounded-xl border border-gray-100 dark:border-dark-700 shadow-card dark:shadow-card-dark overflow-hidden hover:shadow-md transition-all duration-200">
                   <div className="h-3 bg-gradient-to-r from-primary-400 to-primary-600" />
                   <div className="p-5">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900 line-clamp-1 flex-1">{course.title}</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 flex-1">{course.title}</h3>
                       <Badge variant={course.status === 'PUBLIE' ? 'success' : course.status === 'BROUILLON' ? 'warning' : 'gray'}>
                         {course.status === 'PUBLIE' ? 'Publié' : course.status === 'BROUILLON' ? 'Brouillon' : 'Archivé'}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-500 line-clamp-2 mb-3">{course.description || 'Pas de description'}</p>
+                    <p className="text-sm text-gray-500 dark:text-dark-400 line-clamp-2 mb-3">{course.description || 'Pas de description'}</p>
                     {course.category && (
                       <Badge variant="gray">{course.category.name}</Badge>
                     )}
-                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-400">
+                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-400 dark:text-dark-400">
                       <span className="flex items-center gap-1">
                         <span className="material-symbols-outlined text-sm">videocam</span>
                         {course._count?.videos || 0}
@@ -271,17 +271,17 @@ export default function CourseManagementPage() {
                         {course._count?.enrollments || 0}
                       </span>
                     </div>
-                    <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-dark-700">
                       <button
                         onClick={() => setShowContentModal(course)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-all duration-200"
                       >
                         <span className="material-symbols-outlined text-sm">upload_file</span>
                         Contenu
                       </button>
                       <button
                         onClick={() => setEditingCourse(course)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium text-gray-600 dark:text-dark-300 bg-gray-50 dark:bg-dark-700 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition-all duration-200"
                       >
                         <span className="material-symbols-outlined text-sm">edit</span>
                         Modifier
@@ -291,7 +291,7 @@ export default function CourseManagementPage() {
                           const newStatus = course.status === 'PUBLIE' ? 'BROUILLON' : 'PUBLIE';
                           statusMutation.mutate({ id: course.id, status: newStatus });
                         }}
-                        className="flex items-center justify-center w-9 h-9 text-gray-400 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-center w-9 h-9 text-gray-400 dark:text-dark-400 bg-gray-50 dark:bg-dark-700 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-600 transition-all duration-200"
                         title={course.status === 'PUBLIE' ? 'Dépublier' : 'Publier'}
                       >
                         <span className="material-symbols-outlined text-sm">
@@ -300,7 +300,7 @@ export default function CourseManagementPage() {
                       </button>
                       <button
                         onClick={() => setDeleteTarget(course)}
-                        className="flex items-center justify-center w-9 h-9 text-red-400 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                        className="flex items-center justify-center w-9 h-9 text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-200"
                         title="Supprimer"
                       >
                         <span className="material-symbols-outlined text-sm">delete</span>
@@ -348,21 +348,21 @@ export default function CourseManagementPage() {
       {/* Delete Modal */}
       <Modal isOpen={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="Confirmer la suppression" size="sm">
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-dark-300">
             Voulez-vous vraiment supprimer le cours <strong>{deleteTarget?.title}</strong> et tout son contenu ?
             Cette action est irréversible.
           </p>
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setDeleteTarget(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-dark-300 bg-gray-100 dark:bg-dark-700 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-600 transition-all duration-200"
             >
               Annuler
             </button>
             <button
               onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
               disabled={deleteMutation.isPending}
-              className="px-4 py-2 text-sm font-medium text-white bg-danger rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-danger rounded-lg hover:bg-red-600 transition-all duration-200 disabled:opacity-50"
             >
               {deleteMutation.isPending ? 'Suppression...' : 'Supprimer'}
             </button>

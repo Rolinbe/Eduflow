@@ -136,16 +136,16 @@ export default function VoiceCall() {
     : callState.targetUserName || 'Appel';
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center">
+    <div className="fixed inset-0 z-[100] bg-black/80 dark:bg-black/90 flex items-center justify-center">
       <audio ref={remoteAudioRef} autoPlay />
-      <div className="bg-white rounded-3xl p-8 w-[340px] text-center shadow-2xl">
-        <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl font-bold text-primary-600">
+      <div className="bg-white dark:bg-dark-800 rounded-3xl p-8 w-[340px] text-center shadow-2xl transition-colors duration-300">
+        <div className="w-20 h-20 bg-primary-100 dark:bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-3xl font-bold text-primary-600 dark:text-primary-400">
             {displayName?.split(' ').map((n) => n[0]).join('').slice(0, 2)}
           </span>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900">{displayName}</h3>
-        <p className="text-sm text-gray-500 mt-1">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{displayName}</h3>
+        <p className="text-sm text-gray-500 dark:text-dark-400 mt-1">
           {callState.isIncoming && !callState.isActive
             ? 'Appel entrant...'
             : callState.isActive
@@ -157,13 +157,13 @@ export default function VoiceCall() {
           <div className="flex items-center justify-center gap-4 mt-6">
             <button
               onClick={endCall}
-              className="w-14 h-14 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+              className="w-14 h-14 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-all duration-200 hover:scale-110"
             >
               <span className="material-symbols-outlined text-2xl">call_end</span>
             </button>
             <button
               onClick={() => setCallState({ isActive: true, isIncoming: false })}
-              className="w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 animate-pulse"
+              className="w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-all duration-200 hover:scale-110 animate-pulse"
             >
               <span className="material-symbols-outlined text-2xl">call</span>
             </button>
@@ -174,22 +174,22 @@ export default function VoiceCall() {
           <div className="flex items-center justify-center gap-4 mt-6">
             <button
               onClick={toggleMute}
-              className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                isMuted ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 ${
+                isMuted ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400' : 'bg-gray-100 dark:bg-dark-700 text-gray-600 dark:text-dark-200 hover:bg-gray-200 dark:hover:bg-dark-600'
               }`}
             >
               <span className="material-symbols-outlined">{isMuted ? 'mic_off' : 'mic'}</span>
             </button>
             <button
               onClick={endCall}
-              className="w-14 h-14 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+              className="w-14 h-14 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-all duration-200 hover:scale-110"
             >
               <span className="material-symbols-outlined text-2xl">call_end</span>
             </button>
             <button
               onClick={() => setIsSpeakerOn(!isSpeakerOn)}
-              className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-                !isSpeakerOn ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 ${
+                !isSpeakerOn ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400' : 'bg-gray-100 dark:bg-dark-700 text-gray-600 dark:text-dark-200 hover:bg-gray-200 dark:hover:bg-dark-600'
               }`}
             >
               <span className="material-symbols-outlined">{isSpeakerOn ? 'volume_up' : 'volume_off'}</span>

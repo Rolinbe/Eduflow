@@ -87,14 +87,14 @@ export default function UserManagementPage() {
       header: 'Utilisateur',
       render: (item: User) => (
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center">
-            <span className="text-sm font-semibold text-primary-700">
+          <div className="w-9 h-9 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center transition-all duration-200">
+            <span className="text-sm font-semibold text-primary-700 dark:text-primary-400">
               {item.firstName?.[0]}{item.lastName?.[0]}
             </span>
           </div>
           <div>
-            <p className="font-medium text-gray-900">{item.firstName} {item.lastName}</p>
-            <p className="text-xs text-gray-400">{item.email}</p>
+            <p className="font-medium text-gray-900 dark:text-white">{item.firstName} {item.lastName}</p>
+            <p className="text-xs text-gray-400 dark:text-dark-400">{item.email}</p>
           </div>
         </div>
       ),
@@ -117,7 +117,7 @@ export default function UserManagementPage() {
       key: 'niveau',
       header: 'Niveau',
       render: (item: User) => {
-        if (!item.niveau) return <span className="text-xs text-gray-400">-</span>;
+        if (!item.niveau) return <span className="text-xs text-gray-400 dark:text-dark-400">-</span>;
         const label = niveauLabels[item.niveau] || item.niveau;
         const serie = item.niveau === 'TERMINALE' && item.serie ? ` ${item.serie}` : '';
         return <Badge variant="info">{label}{serie}</Badge>;
@@ -127,7 +127,7 @@ export default function UserManagementPage() {
       key: 'createdAt',
       header: 'Inscrit le',
       render: (item: User) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500 dark:text-dark-400">
           {new Date(item.createdAt).toLocaleDateString('fr-FR')}
         </span>
       ),
@@ -164,19 +164,19 @@ export default function UserManagementPage() {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex flex-col sm:flex-row gap-3 flex-1">
           <div className="relative flex-1 max-w-md">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 text-xl">search</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 dark:text-dark-400 text-xl">search</span>
             <input
               type="text"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 dark:text-white transition-all duration-200"
               placeholder="Rechercher un utilisateur..."
             />
           </div>
           <select
             value={roleFilter}
             onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-            className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+            className="px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 dark:text-white transition-all duration-200"
           >
             <option value="">Tous les rôles</option>
             <option value="ADMIN">Admin</option>
@@ -185,7 +185,7 @@ export default function UserManagementPage() {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-            className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+            className="px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 dark:text-white transition-all duration-200"
           >
             <option value="">Tous les statuts</option>
             <option value="ACTIF">Actif</option>
@@ -225,21 +225,21 @@ export default function UserManagementPage() {
         size="sm"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-dark-300">
             Voulez-vous vraiment supprimer l'utilisateur <strong>{deleteTarget?.firstName} {deleteTarget?.lastName}</strong> ?
             Cette action est irréversible.
           </p>
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setDeleteTarget(null)}
-              className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-dark-300 bg-gray-100 dark:bg-dark-700 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-600 transition-all duration-200"
             >
               Annuler
             </button>
             <button
               onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
               disabled={deleteMutation.isPending}
-              className="px-4 py-2 text-sm font-medium text-white bg-danger rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-danger rounded-lg hover:bg-red-600 transition-all duration-200 disabled:opacity-50"
             >
               {deleteMutation.isPending ? 'Suppression...' : 'Supprimer'}
             </button>
@@ -279,22 +279,22 @@ function UserProgressDetail({ userId }: { userId: number }) {
   if (isLoading) return <LoadingSpinner className="py-8" />;
 
   if (!result || !result.enrollments || result.enrollments.length === 0) {
-    return <p className="text-sm text-gray-400 text-center py-4">Aucune donnée de progression</p>;
+    return <p className="text-sm text-gray-400 dark:text-dark-400 text-center py-4">Aucune donnée de progression</p>;
   }
 
   return (
     <div className="space-y-4">
       {result.enrollments.map((enrollment: any) => (
-        <div key={enrollment.id} className="border border-gray-100 rounded-lg p-4">
+        <div key={enrollment.id} className="border border-gray-100 dark:border-dark-700 rounded-lg p-4 transition-all duration-200">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-gray-900 dark:text-white">
               {enrollment.cours?.title || 'Cours'}
             </p>
             <div className="flex items-center gap-2">
               <span className={`text-xs font-medium ${enrollment.progress >= 100 ? 'text-success' : 'text-primary-500'}`}>
                 {enrollment.progress >= 100 ? 'Terminé' : 'En cours'}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-dark-400">
                 {enrollment.progress}%
               </span>
             </div>
@@ -334,18 +334,18 @@ function ResetPasswordForm({ user, isPending, onSubmit }: { user: User | null; i
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-      <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-        <span className="material-symbols-outlined text-yellow-600">warning</span>
-        <p className="text-xs text-yellow-700">
+      <div className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg transition-all duration-200">
+        <span className="material-symbols-outlined text-yellow-600 dark:text-yellow-400">warning</span>
+        <p className="text-xs text-yellow-700 dark:text-yellow-300">
           Un notification sera envoyée à <strong>{user?.firstName}</strong> l'informant du changement.
         </p>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Nouveau mot de passe</label>
         <input
           type="password"
           {...register('newPassword')}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 dark:text-white transition-all duration-200"
           placeholder="Minimum 8 caractères"
         />
         {errors.newPassword && (
@@ -353,11 +353,11 @@ function ResetPasswordForm({ user, isPending, onSubmit }: { user: User | null; i
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Confirmer le mot de passe</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Confirmer le mot de passe</label>
         <input
           type="password"
           {...register('confirmPassword')}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-dark-800 dark:text-white transition-all duration-200"
           placeholder="Retapez le mot de passe"
         />
         {errors.confirmPassword && (
@@ -368,14 +368,14 @@ function ResetPasswordForm({ user, isPending, onSubmit }: { user: User | null; i
         <button
           type="button"
           onClick={() => { reset(); }}
-          className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-dark-300 bg-gray-100 dark:bg-dark-700 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-600 transition-all duration-200"
         >
           Annuler
         </button>
         <button
           type="submit"
           disabled={isPending}
-          className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50"
+          className="px-4 py-2 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 transition-all duration-200 disabled:opacity-50"
         >
           {isPending ? 'Réinitialisation...' : 'Réinitialiser'}
         </button>

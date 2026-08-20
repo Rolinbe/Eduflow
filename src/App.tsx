@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { useEffect } from 'react';
 import { getSocket, disconnectSocket } from './services/socket';
+import { useThemeStore } from './stores/themeStore';
 import type { ReactNode } from 'react';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -33,6 +34,15 @@ function ProtectedRoute({ children, role }: { children: ReactNode; role: string 
 
 export default function App() {
   const { user, isAuthenticated } = useAuthStore();
+  const { isDark } = useThemeStore();
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   useEffect(() => {
     if (isAuthenticated) {
