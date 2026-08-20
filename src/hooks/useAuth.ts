@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
+function getHomePath(role: string) {
+  if (role === 'ADMIN') return '/admin';
+  if (role === 'MENTOR') return '/mentor';
+  return '/student';
+}
+
 export function useAuth() {
   const { user, isAuthenticated, login, logout, updateUser } = useAuthStore();
   const navigate = useNavigate();
@@ -11,14 +17,14 @@ export function useAuth() {
     const res = await api.post('/auth/login', { email, password });
     login(res.data.user, res.data.token, res.data.refreshToken);
     toast.success('Connexion réussie!');
-    navigate(res.data.user.role === 'ADMIN' ? '/admin' : '/student');
+    navigate(getHomePath(res.data.user.role));
   };
 
-  const handleRegister = async (data: { firstName: string; lastName: string; email: string; password: string; niveau?: string; serie?: string }) => {
+  const handleRegister = async (data: { firstName: string; lastName: string; email: string; password: string; role?: string; niveau?: string; serie?: string; niveauResponsable?: string; serieResponsable?: string }) => {
     const res = await api.post('/auth/register', data);
     login(res.data.user, res.data.token, res.data.refreshToken);
     toast.success('Compte créé avec succès!');
-    navigate('/student');
+    navigate(getHomePath(res.data.user.role));
   };
 
   const handleLogout = async () => {

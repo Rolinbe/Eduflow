@@ -3,10 +3,12 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'ADMIN' | 'APPRENANT';
+  role: 'ADMIN' | 'APPRENANT' | 'MENTOR';
   status: 'ACTIF' | 'INACTIF' | 'BLOQUE';
   niveau?: 'SIXIEME' | 'CINQUIEME' | 'QUATRIEME' | 'TROISIEME' | 'SECONDE' | 'PREMIERE' | 'TERMINALE' | null;
   serie?: 'S' | 'L' | 'OSE' | null;
+  niveauResponsable?: 'SIXIEME' | 'CINQUIEME' | 'QUATRIEME' | 'TROISIEME' | 'SECONDE' | 'PREMIERE' | 'TERMINALE' | null;
+  serieResponsable?: 'S' | 'L' | 'OSE' | null;
   avatar?: string | null;
   lastLogin?: string;
   createdAt: string;
@@ -30,6 +32,7 @@ export interface Cours {
   niveau?: 'SIXIEME' | 'CINQUIEME' | 'QUATRIEME' | 'TROISIEME' | 'SECONDE' | 'PREMIERE' | 'TERMINALE' | null;
   serie?: 'S' | 'L' | 'OSE' | null;
   category?: Category;
+  admin?: { id: number; firstName: string; lastName: string };
   _count?: { videos: number; pdfs: number; enrollments?: number };
   videos?: Video[];
   pdfs?: Pdf[];
