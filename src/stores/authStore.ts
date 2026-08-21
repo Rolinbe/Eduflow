@@ -28,7 +28,7 @@ export const useAuthStore = create<AuthState>()(
       setTokens: (token, refreshToken) => set({ token, refreshToken }),
     }),
     {
-      name: 'eduflow-auth',
+      name: 'edukaflow-auth',
     }
   )
 );

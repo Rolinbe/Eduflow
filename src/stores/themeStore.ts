@@ -7,11 +7,11 @@ interface ThemeStore {
 }
 
 export const useThemeStore = create<ThemeStore>((set) => ({
-  isDark: localStorage.getItem('eduflow-dark') === 'true',
+  isDark: localStorage.getItem('edukaflow-dark') === 'true',
   toggle: () =>
     set((state) => {
       const next = !state.isDark;
-      localStorage.setItem('eduflow-dark', String(next));
+      localStorage.setItem('edukaflow-dark', String(next));
       if (next) {
         document.documentElement.classList.add('dark');
       } else {
@@ -20,7 +20,7 @@ export const useThemeStore = create<ThemeStore>((set) => ({
       return { isDark: next };
     }),
   setDark: (dark: boolean) => {
-    localStorage.setItem('eduflow-dark', String(dark));
+    localStorage.setItem('edukaflow-dark', String(dark));
     if (dark) {
       document.documentElement.classList.add('dark');
     } else {

@@ -10,11 +10,6 @@ export default function LoginPage() {
     <AuthLayout>
       <div>
         <div className="text-center mb-8">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25">
-            <span className="material-symbols-outlined text-white text-2xl">
-              {isLogin ? 'login' : 'person_add'}
-            </span>
-          </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
             {isLogin ? 'Bienvenue !' : 'Créez votre compte'}
           </h2>
