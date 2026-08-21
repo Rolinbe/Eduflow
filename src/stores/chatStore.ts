@@ -6,7 +6,7 @@ export interface ChatMessage {
   conversationId: number;
   senderId: number;
   content: string;
-  status: 'SENT' | 'DELIVERED' | 'READ';
+  status: 'PENDING' | 'SENT' | 'DELIVERED' | 'READ';
   createdAt: string;
   sender?: { id: number; firstName: string; lastName: string; role?: string };
 }
@@ -40,6 +40,9 @@ interface ChatState {
   setActiveConversationId: (id: number | null) => void;
   setMessages: (messages: ChatMessage[]) => void;
   addMessage: (message: ChatMessage) => void;
+  addPendingMessage: (message: ChatMessage) => void;
+  confirmPendingMessage: (tempId: number, realMessage: ChatMessage) => void;
+  updateMessageStatus: (messageId: number, status: ChatMessage['status']) => void;
   updateConversationLastMessage: (conversationId: number, message: ChatMessage) => void;
   markConversationRead: (conversationId: number) => void;
   setTyping: (userId: number, isTyping: boolean) => void;
@@ -66,7 +69,16 @@ export const useChatStore = create<ChatState>((set) => ({
   setActiveConversationId: (id) => set({ activeConversationId: id }),
   setMessages: (messages) => set({ messages }),
   addMessage: (message) => set((state) => ({
+    messages: state.messages.some((m) => m.id === message.id) ? state.messages : [...state.messages, message],
+  })),
+  addPendingMessage: (message) => set((state) => ({
     messages: [...state.messages, message],
+  })),
+  confirmPendingMessage: (tempId, realMessage) => set((state) => ({
+    messages: state.messages.map((m) => m.id === tempId ? { ...realMessage, status: realMessage.status || 'SENT' } : m),
+  })),
+  updateMessageStatus: (messageId, status) => set((state) => ({
+    messages: state.messages.map((m) => m.id === messageId ? { ...m, status } : m),
   })),
   updateConversationLastMessage: (conversationId, message) => set((state) => ({
     conversations: state.conversations.map((c) =>

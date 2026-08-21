@@ -12,17 +12,20 @@ export default function ChatPanel() {
   const [showNewChat, setShowNewChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const messagesRef = useRef<any[]>([]);
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const {
     conversations, setConversations,
     activeConversationId, setActiveConversationId,
-    messages, setMessages, addMessage,
+    messages, setMessages, addMessage, addPendingMessage, confirmPendingMessage,
     updateConversationLastMessage, markConversationRead,
     callState, setCallState, resetCallState,
     typingUsers, setTyping,
     onlineUsers, setUserOnline,
   } = useChatStore();
+
+  messagesRef.current = messages;
 
   const { data: convData } = useQuery({
     queryKey: ['admin-chat-conversations'],
@@ -70,17 +73,44 @@ export default function ChatPanel() {
   useEffect(() => {
     const socket = getSocket();
 
-    socket.on('new-message-notification', (data: any) => {
+    socket.on('new-message', (msg: any) => {
       queryClient.invalidateQueries({ queryKey: ['admin-chat-conversations'] });
-      if (data.conversationId === activeConversationId) {
-        addMessage(data.message);
+      if (msg.conversationId === activeConversationId) {
+        const pendingIndex = messagesRef.current.findIndex(
+          (m: any) => m.id < 0 && m.senderId === user?.id && m.content === msg.content
+        );
+        if (pendingIndex !== -1) {
+          confirmPendingMessage(messagesRef.current[pendingIndex].id, msg);
+        } else {
+          addMessage(msg);
+        }
         socket.emit('mark-read', { conversationId: activeConversationId });
       }
     });
 
-    socket.on('message-sent', (data: any) => {
-      addMessage(data.message);
+    socket.on('new-message-notification', (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['admin-chat-conversations'] });
+      if (data.conversationId === activeConversationId) {
+        const pendingIndex = messagesRef.current.findIndex(
+          (m: any) => m.id < 0 && m.senderId === user?.id && m.content === data.message.content
+        );
+        if (pendingIndex !== -1) {
+          confirmPendingMessage(messagesRef.current[pendingIndex].id, data.message);
+        } else {
+          addMessage(data.message);
+        }
+        socket.emit('mark-read', { conversationId: activeConversationId });
+      }
+    });
+
+    socket.on('messages-read', (data: { conversationId: number; readBy: number }) => {
+      if (data.conversationId === activeConversationId) {
+        setMessages(
+          messagesRef.current.map((m: any) =>
+            m.senderId === user?.id && m.status !== 'READ' ? { ...m, status: 'READ' as const } : m
+          )
+        );
+      }
     });
 
     socket.on('user-typing', (data: { userId: number }) => setTyping(data.userId, true));
@@ -95,8 +125,9 @@ export default function ChatPanel() {
     socket.on('call-ended', () => resetCallState());
 
     return () => {
+      socket.off('new-message');
       socket.off('new-message-notification');
-      socket.off('message-sent');
+      socket.off('messages-read');
       socket.off('user-typing');
       socket.off('user-stop-typing');
       socket.off('user-online');
@@ -105,7 +136,7 @@ export default function ChatPanel() {
       socket.off('call-rejected');
       socket.off('call-ended');
     };
-  }, [activeConversationId, queryClient, addMessage, setTyping, setUserOnline, setCallState, resetCallState]);
+  }, [activeConversationId, queryClient, addMessage, addPendingMessage, confirmPendingMessage, setMessages, user, setTyping, setUserOnline, setCallState, resetCallState]);
 
   const startConversation = async (studentId: number) => {
     const res = await api.post('/chat/conversations', { targetUserId: studentId });
@@ -133,7 +164,19 @@ export default function ChatPanel() {
 
   const sendMessage = () => {
     if (!inputValue.trim() || !activeConversationId) return;
-    getSocket().emit('send-message', { conversationId: activeConversationId, content: inputValue.trim() });
+    const content = inputValue.trim();
+    const tempId = -(Date.now());
+    const pendingMsg: any = {
+      id: tempId,
+      conversationId: activeConversationId,
+      senderId: user?.id || 0,
+      content,
+      status: 'PENDING' as const,
+      createdAt: new Date().toISOString(),
+      sender: { id: user?.id || 0, firstName: user?.firstName || '', lastName: user?.lastName || '', role: user?.role },
+    };
+    addPendingMessage(pendingMsg);
+    getSocket().emit('send-message', { conversationId: activeConversationId, content });
     getSocket().emit('stop-typing', { conversationId: activeConversationId });
     setInputValue('');
   };
@@ -334,12 +377,24 @@ export default function ChatPanel() {
                         : 'bg-white dark:bg-dark-800 text-gray-900 dark:text-white rounded-bl-md shadow-sm border border-gray-100 dark:border-dark-600'
                     }`}>
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      <p className={`text-[10px] mt-1 ${isMine ? 'text-white/60' : 'text-gray-400 dark:text-dark-400'}`}>
-                        {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                        {isMine && msg.status === 'READ' && (
-                          <span className="ml-1">✓✓</span>
+                      <div className={`flex items-center justify-end gap-1 mt-1 ${isMine ? 'text-white/60' : 'text-gray-400 dark:text-dark-400'}`}>
+                        <span className="text-[10px]">
+                          {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {isMine && (
+                          <span className="ml-0.5">
+                            {msg.status === 'PENDING' ? (
+                              <span className="material-symbols-outlined text-[11px] animate-spin">progress_activity</span>
+                            ) : msg.status === 'SENT' ? (
+                              <span className="material-symbols-outlined text-[11px]">done</span>
+                            ) : msg.status === 'DELIVERED' ? (
+                              <span className="material-symbols-outlined text-[11px]">done_all</span>
+                            ) : (
+                              <span className="material-symbols-outlined text-[11px] text-blue-200">done_all</span>
+                            )}
+                          </span>
                         )}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 );
