@@ -38,7 +38,7 @@ export default function MentorSidebar({ isOpen = false, onClose }: MentorSidebar
             </div>
             <div>
               <h1 className="text-lg font-extrabold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-                EduFlow
+                EdukaFlow
               </h1>
               <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-dark-400">Espace Mentor</p>
             </div>

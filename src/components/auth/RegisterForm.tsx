@@ -17,6 +17,12 @@ const niveauLabels: Record<string, string> = {
   LICENCE: 'Licence', MASTER: 'Master', DOCTORAT: 'Doctorat',
 };
 
+const inputClass = "w-full px-4 py-3.5 border-2 border-gray-100 dark:border-dark-700 rounded-2xl text-sm bg-white dark:bg-dark-900 dark:text-white focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-dark-500 hover:border-gray-200 dark:hover:border-dark-600 shadow-sm";
+const inputClassViolet = "w-full px-4 py-3.5 border-2 border-gray-100 dark:border-dark-700 rounded-2xl text-sm bg-white dark:bg-dark-900 dark:text-white focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-dark-500 hover:border-gray-200 dark:hover:border-dark-600 shadow-sm";
+const iconInputClass = "w-full pl-12 pr-4 py-3.5 border-2 border-gray-100 dark:border-dark-700 rounded-2xl text-sm bg-white dark:bg-dark-900 dark:text-white focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all duration-300 placeholder:text-gray-400 dark:placeholder:text-dark-500 hover:border-gray-200 dark:hover:border-dark-600 shadow-sm";
+const labelClass = "block text-sm font-semibold text-gray-600 dark:text-dark-300 mb-2 transition-colors duration-200";
+const errorClass = "text-xs text-danger mt-2 font-medium flex items-center gap-1";
+
 const registerSchema = z.object({
   lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
   firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
@@ -92,7 +98,6 @@ export default function RegisterForm() {
   const showEmail = isMentor || (selectedNiveau && !niveauBelowSeconde.includes(selectedNiveau));
 
   const mentorNiveau = watch('mentorNiveau');
-  const mentorSerie = watch('mentorSerie');
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
@@ -177,246 +182,243 @@ export default function RegisterForm() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      {/* Account Type Selection */}
-      <div>
-        <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-3">Je suis</label>
-        <div className="grid grid-cols-2 gap-3">
-          <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-            !isMentor
-              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-1 ring-primary-200 dark:ring-primary-800/30'
-              : 'border-gray-200 dark:border-dark-600 hover:border-gray-300 dark:hover:border-dark-500'
-          }`}>
-            <input type="radio" value="APPRENANT" {...register('accountType')} className="sr-only" />
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              !isMentor ? 'bg-primary-500 shadow-lg shadow-primary-500/30' : 'bg-gray-200 dark:bg-dark-600'
-            }`}>
-              <span className={`material-symbols-outlined text-xl ${!isMentor ? 'text-white' : 'text-gray-500 dark:text-dark-400'}`}>school</span>
-            </div>
-            <div>
-              <p className={`text-sm font-bold ${!isMentor ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-dark-200'}`}>Apprenant</p>
-              <p className="text-xs text-gray-400 dark:text-dark-400">Je veux apprendre</p>
-            </div>
-          </label>
-          <label className={`relative flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-            isMentor
-              ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 ring-1 ring-violet-200 dark:ring-violet-800/30'
-              : 'border-gray-200 dark:border-dark-600 hover:border-gray-300 dark:hover:border-dark-500'
-          }`}>
-            <input type="radio" value="MENTOR" {...register('accountType')} className="sr-only" />
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              isMentor ? 'bg-violet-500 shadow-lg shadow-violet-500/30' : 'bg-gray-200 dark:bg-dark-600'
-            }`}>
-              <span className={`material-symbols-outlined text-xl ${isMentor ? 'text-white' : 'text-gray-500 dark:text-dark-400'}`}>psychology</span>
-            </div>
-            <div>
-              <p className={`text-sm font-bold ${isMentor ? 'text-violet-700 dark:text-violet-300' : 'text-gray-700 dark:text-dark-200'}`}>Mentor</p>
-              <p className="text-xs text-gray-400 dark:text-dark-400">Je veux enseigner</p>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
+        {/* Account Type Selection */}
         <div>
-          <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Nom</label>
-          <input
-            {...register('lastName')}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-            placeholder="Dupont"
-          />
-          {errors.lastName && <p className="text-xs text-danger mt-1.5 font-medium">{errors.lastName.message}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Prénom</label>
-          <input
-            {...register('firstName')}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-            placeholder="Jean"
-          />
-          {errors.firstName && <p className="text-xs text-danger mt-1.5 font-medium">{errors.firstName.message}</p>}
-        </div>
-      </div>
-
-      {/* Mentor: son propre niveau d'étude */}
-      {isMentor && (
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Mon niveau d'études</label>
-            <select
-              {...register('mentorNiveau')}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
-            >
-              <option value="">Sélectionner</option>
-              {niveauValues.map((n) => (
-                <option key={n} value={n}>{niveauLabels[n]}</option>
-              ))}
-            </select>
-            {errors.mentorNiveau && <p className="text-xs text-danger mt-1.5 font-medium">{errors.mentorNiveau.message}</p>}
+          <label className={labelClass}>Je suis</label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className={`group relative flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+              !isMentor
+                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-lg shadow-primary-500/10'
+                : 'border-gray-100 dark:border-dark-700 hover:border-gray-200 dark:hover:border-dark-600 hover:shadow-md'
+            }`}>
+              <input type="radio" value="APPRENANT" {...register('accountType')} className="sr-only" />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                !isMentor ? 'bg-primary-500 shadow-lg shadow-primary-500/30 scale-110' : 'bg-gray-100 dark:bg-dark-700 group-hover:bg-gray-200 dark:group-hover:bg-dark-600'
+              }`}>
+                <span className={`material-symbols-outlined text-xl transition-colors duration-300 ${!isMentor ? 'text-white' : 'text-gray-400 dark:text-dark-500'}`}>school</span>
+              </div>
+              <div>
+                <p className={`text-sm font-bold transition-colors duration-300 ${!isMentor ? 'text-primary-700 dark:text-primary-300' : 'text-gray-600 dark:text-dark-300'}`}>Apprenant</p>
+                <p className="text-xs text-gray-400 dark:text-dark-500">Je veux apprendre</p>
+              </div>
+            </label>
+            <label className={`group relative flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+              isMentor
+                ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 shadow-lg shadow-violet-500/10'
+                : 'border-gray-100 dark:border-dark-700 hover:border-gray-200 dark:hover:border-dark-600 hover:shadow-md'
+            }`}>
+              <input type="radio" value="MENTOR" {...register('accountType')} className="sr-only" />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                isMentor ? 'bg-violet-500 shadow-lg shadow-violet-500/30 scale-110' : 'bg-gray-100 dark:bg-dark-700 group-hover:bg-gray-200 dark:group-hover:bg-dark-600'
+              }`}>
+                <span className={`material-symbols-outlined text-xl transition-colors duration-300 ${isMentor ? 'text-white' : 'text-gray-400 dark:text-dark-500'}`}>psychology</span>
+              </div>
+              <div>
+                <p className={`text-sm font-bold transition-colors duration-300 ${isMentor ? 'text-violet-700 dark:text-violet-300' : 'text-gray-600 dark:text-dark-300'}`}>Mentor</p>
+                <p className="text-xs text-gray-400 dark:text-dark-500">Je veux enseigner</p>
+              </div>
+            </label>
           </div>
-          {(mentorNiveau === 'PREMIERE' || mentorNiveau === 'TERMINALE') && (
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Série</label>
-              <select
-                {...register('mentorSerie')}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
-              >
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="group">
+            <label className={labelClass}>Nom</label>
+            <input
+              {...register('lastName')}
+              className={inputClass}
+              placeholder="Dupont"
+            />
+            {errors.lastName && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.lastName.message}</p>}
+          </div>
+          <div className="group">
+            <label className={labelClass}>Prénom</label>
+            <input
+              {...register('firstName')}
+              className={inputClass}
+              placeholder="Jean"
+            />
+            {errors.firstName && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.firstName.message}</p>}
+          </div>
+        </div>
+
+        {/* Mentor: son propre niveau d'étude */}
+        {isMentor && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="group">
+              <label className={labelClass}>Mon niveau d'études</label>
+              <select {...register('mentorNiveau')} className={inputClassViolet}>
                 <option value="">Sélectionner</option>
-                {serieValues.map((s) => (
-                  <option key={s} value={s}>Série {s}</option>
+                {niveauValues.map((n) => (
+                  <option key={n} value={n}>{niveauLabels[n]}</option>
                 ))}
               </select>
-              {errors.mentorSerie && <p className="text-xs text-danger mt-1.5 font-medium">{errors.mentorSerie.message}</p>}
+              {errors.mentorNiveau && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.mentorNiveau.message}</p>}
             </div>
-          )}
-        </div>
-      )}
+            {(mentorNiveau === 'PREMIERE' || mentorNiveau === 'TERMINALE') && (
+              <div className="group">
+                <label className={labelClass}>Série</label>
+                <select {...register('mentorSerie')} className={inputClassViolet}>
+                  <option value="">Sélectionner</option>
+                  {serieValues.map((s) => (
+                    <option key={s} value={s}>Série {s}</option>
+                  ))}
+                </select>
+                {errors.mentorSerie && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.mentorSerie.message}</p>}
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Mentor: niveau responsable */}
-      {isMentor && (
-        <div>
-          <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Niveau responsable</label>
-          <select
-            {...register('niveauResponsable')}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-          >
-            <option value="">Sélectionner le niveau</option>
-            {niveauSecondaireValues.map((n) => (
-              <option key={n} value={n}>{niveauLabels[n]}</option>
-            ))}
-          </select>
-          {errors.niveauResponsable && <p className="text-xs text-danger mt-1.5 font-medium">{errors.niveauResponsable.message}</p>}
-        </div>
-      )}
-
-      {/* Mentor: série responsable (only for Première / Terminale) */}
-      {isMentor && (selectedNiveauResponsable === 'PREMIERE' || selectedNiveauResponsable === 'TERMINALE') && (
-        <div>
-          <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Série du niveau</label>
-          <select
-            {...register('serieResponsable')}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-          >
-            <option value="">Sélectionner la série</option>
-            {serieValues.map((s) => (
-              <option key={s} value={s}>Série {s}</option>
-            ))}
-          </select>
-          {errors.serieResponsable && <p className="text-xs text-danger mt-1.5 font-medium">{errors.serieResponsable.message}</p>}
-        </div>
-      )}
-
-      {/* Apprenant: niveau + série */}
-      {!isMentor && (
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Niveau</label>
-            <select
-              {...register('niveau')}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-            >
-              <option value="">Sélectionner</option>
+        {/* Mentor: niveau responsable */}
+        {isMentor && (
+          <div className="group">
+            <label className={labelClass}>Niveau responsable</label>
+            <select {...register('niveauResponsable')} className={inputClass}>
+              <option value="">Sélectionner le niveau</option>
               {niveauSecondaireValues.map((n) => (
                 <option key={n} value={n}>{niveauLabels[n]}</option>
               ))}
             </select>
+            {errors.niveauResponsable && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.niveauResponsable.message}</p>}
           </div>
-          {selectedNiveau === 'PREMIERE' && (
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Série</label>
-              <select
-                {...register('serie')}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-              >
+        )}
+
+        {/* Mentor: série responsable */}
+        {isMentor && (selectedNiveauResponsable === 'PREMIERE' || selectedNiveauResponsable === 'TERMINALE') && (
+          <div className="group">
+            <label className={labelClass}>Série du niveau</label>
+            <select {...register('serieResponsable')} className={inputClass}>
+              <option value="">Sélectionner la série</option>
+              {serieValues.map((s) => (
+                <option key={s} value={s}>Série {s}</option>
+              ))}
+            </select>
+            {errors.serieResponsable && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.serieResponsable.message}</p>}
+          </div>
+        )}
+
+        {/* Apprenant: niveau + série */}
+        {!isMentor && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="group">
+              <label className={labelClass}>Niveau</label>
+              <select {...register('niveau')} className={inputClass}>
                 <option value="">Sélectionner</option>
-                {serieValues.map((s) => (
-                  <option key={s} value={s}>Série {s}</option>
+                {niveauSecondaireValues.map((n) => (
+                  <option key={n} value={n}>{niveauLabels[n]}</option>
                 ))}
               </select>
-              {errors.serie && <p className="text-xs text-danger mt-1.5 font-medium">{errors.serie.message}</p>}
             </div>
-          )}
-        </div>
-      )}
+            {selectedNiveau === 'PREMIERE' && (
+              <div className="group">
+                <label className={labelClass}>Série</label>
+                <select {...register('serie')} className={inputClass}>
+                  <option value="">Sélectionner</option>
+                  {serieValues.map((s) => (
+                    <option key={s} value={s}>Série {s}</option>
+                  ))}
+                </select>
+                {errors.serie && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.serie.message}</p>}
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Email — visible only for mentors and apprenants >= Seconde */}
-      {showEmail && (
-        <div>
-          <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Email</label>
+        {/* Email */}
+        {showEmail && (
+          <div className="group">
+            <label className={labelClass}>Adresse email</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 dark:text-dark-500 text-xl transition-all duration-200 group-focus-within:text-primary-500 group-focus-within:scale-110">
+                mail
+              </span>
+              <input
+                {...register('email')}
+                type="email"
+                className={iconInputClass}
+                placeholder="vous@exemple.com"
+              />
+            </div>
+            {errors.email && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.email.message}</p>}
+          </div>
+        )}
+
+        {!showEmail && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 dark:border-blue-800/50 rounded-2xl p-4 flex items-start gap-3">
+            <span className="material-symbols-outlined text-blue-500 text-xl mt-0.5">info</span>
+            <p className="text-sm text-blue-600 dark:text-blue-400 leading-relaxed">
+              Pas encore d'email ? Pas de souci, un identifiant de connexion vous sera attribué automatiquement.
+            </p>
+          </div>
+        )}
+
+        {/* Password */}
+        <div className="group">
+          <label className={labelClass}>Mot de passe</label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 dark:text-dark-400 text-xl">mail</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 dark:text-dark-500 text-xl transition-all duration-200 group-focus-within:text-primary-500 group-focus-within:scale-110">
+              lock
+            </span>
             <input
-              {...register('email')}
-              type="email"
-              className="w-full pl-12 pr-4 py-3.5 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-dark-500"
-              placeholder="vous@exemple.com"
+              {...register('password')}
+              type={showPassword ? 'text' : 'password'}
+              className={iconInputClass.replace('pr-4', 'pr-12')}
+              placeholder="••••••••"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-200 hover:scale-110"
+            >
+              <span className="material-symbols-outlined text-xl">
+                {showPassword ? 'visibility_off' : 'visibility'}
+              </span>
+            </button>
+          </div>
+          {errors.password && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.password.message}</p>}
+        </div>
+
+        {/* Confirm password */}
+        <div className="group">
+          <label className={labelClass}>Confirmer le mot de passe</label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 dark:text-dark-500 text-xl transition-all duration-200 group-focus-within:text-primary-500 group-focus-within:scale-110">
+              lock_check
+            </span>
+            <input
+              {...register('confirmPassword')}
+              type="password"
+              className={iconInputClass}
+              placeholder="••••••••"
             />
           </div>
-          {errors.email && <p className="text-xs text-danger mt-1.5 font-medium">{errors.email.message}</p>}
+          {errors.confirmPassword && <p className={errorClass}><span className="material-symbols-outlined text-sm">error</span>{errors.confirmPassword.message}</p>}
         </div>
-      )}
 
-      {!showEmail && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-start gap-3">
-          <span className="material-symbols-outlined text-blue-500 text-xl mt-0.5">info</span>
-          <p className="text-xs text-blue-600 dark:text-blue-400">
-            Vous n'avez pas encore d'email ? Pas de souci, un identifiant de connexion vous sera attribué automatiquement.
-          </p>
-        </div>
-      )}
-
-      <div>
-        <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Mot de passe</label>
-        <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-400 dark:text-dark-400 text-xl">lock</span>
-          <input
-            {...register('password')}
-            type={showPassword ? 'text' : 'password'}
-            className="w-full pl-12 pr-12 py-3.5 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-dark-500"
-            placeholder="••••••••"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-400 hover:text-gray-600 dark:hover:text-dark-200 transition-colors duration-200"
-          >
-            <span className="material-symbols-outlined text-xl">
-              {showPassword ? 'visibility_off' : 'visibility'}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`relative w-full py-4 rounded-2xl text-sm font-bold transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg active:scale-[0.98] overflow-hidden group/btn ${
+            isMentor
+              ? 'bg-gradient-to-r from-violet-500 via-violet-600 to-violet-500 bg-[length:200%_100%] text-white hover:bg-right shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/40'
+              : 'bg-gradient-to-r from-primary-500 via-primary-600 to-primary-500 bg-[length:200%_100%] text-white hover:bg-right shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/40'
+          }`}
+        >
+          <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-200%] group-hover/btn:translate-x-[200%] transition-transform duration-700" />
+          {isLoading ? (
+            <span className="flex items-center justify-center gap-2 relative z-10">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Inscription...
             </span>
-          </button>
-        </div>
-        {errors.password && <p className="text-xs text-danger mt-1.5 font-medium">{errors.password.message}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm font-bold text-gray-700 dark:text-dark-200 mb-2">Confirmer le mot de passe</label>
-        <input
-          {...register('confirmPassword')}
-          type="password"
-          className="w-full px-4 py-3.5 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-          placeholder="••••••••"
-        />
-        {errors.confirmPassword && <p className="text-xs text-danger mt-1.5 font-medium">{errors.confirmPassword.message}</p>}
-      </div>
-
-      <button
-        type="submit"
-        disabled={isLoading}
-        className={`w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg active:scale-[0.98] ${
-          isMentor
-            ? 'bg-gradient-to-r from-violet-500 to-violet-600 text-white hover:from-violet-600 hover:to-violet-700 shadow-violet-500/25 hover:shadow-xl hover:shadow-violet-500/30'
-            : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30'
-        }`}
-      >
-        {isLoading ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Inscription...
-          </span>
-        ) : (
-          isMentor ? "Créer un compte Mentor" : "Créer un compte"
-        )}
-      </button>
-    </form>
+          ) : (
+            <span className="flex items-center justify-center gap-2 relative z-10">
+              <span className="material-symbols-outlined text-lg">{isMentor ? 'psychology' : 'person_add'}</span>
+              {isMentor ? "Créer un compte Mentor" : "Créer un compte"}
+            </span>
+          )}
+        </button>
+      </form>
     </>
   );
 }

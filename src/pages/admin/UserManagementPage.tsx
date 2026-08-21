@@ -17,6 +17,7 @@ import type { User, PaginatedResponse } from '../../types';
 const niveauLabels: Record<string, string> = {
   SIXIEME: '6ème', CINQUIEME: '5ème', QUATRIEME: '4ème', TROISIEME: '3ème',
   SECONDE: 'Seconde', PREMIERE: 'Première', TERMINALE: 'Terminale',
+  LICENCE: 'Licence', MASTER: 'Master', DOCTORAT: 'Doctorat',
 };
 
 const editProfileSchema = z.object({
@@ -24,7 +25,7 @@ const editProfileSchema = z.object({
   lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
   email: z.string().email('Email invalide'),
   role: z.enum(['ADMIN', 'APPRENANT', 'MENTOR']),
-  niveau: z.enum(['SIXIEME', 'CINQUIEME', 'QUATRIEME', 'TROISIEME', 'SECONDE', 'PREMIERE', 'TERMINALE']).nullable().optional(),
+  niveau: z.enum(['SIXIEME', 'CINQUIEME', 'QUATRIEME', 'TROISIEME', 'SECONDE', 'PREMIERE', 'TERMINALE', 'LICENCE', 'MASTER', 'DOCTORAT']).nullable().optional(),
   serie: z.enum(['S', 'L', 'OSE']).nullable().optional(),
   niveauResponsable: z.enum(['SIXIEME', 'CINQUIEME', 'QUATRIEME', 'TROISIEME', 'SECONDE', 'PREMIERE', 'TERMINALE']).nullable().optional(),
   serieResponsable: z.enum(['S', 'L', 'OSE']).nullable().optional(),
@@ -247,6 +248,7 @@ export default function UserManagementPage() {
             user={editTarget}
             isPending={editProfileMutation.isPending}
             onSubmit={(formData) => editProfileMutation.mutate({ id: editTarget.id, data: formData })}
+            onCancel={() => setEditTarget(null)}
           />
         )}
       </Modal>
@@ -309,7 +311,7 @@ export default function UserManagementPage() {
   );
 }
 
-function EditProfileForm({ user, isPending, onSubmit }: { user: User; isPending: boolean; onSubmit: (data: EditProfileFormData) => void }) {
+function EditProfileForm({ user, isPending, onSubmit, onCancel }: { user: User; isPending: boolean; onSubmit: (data: EditProfileFormData) => void; onCancel: () => void }) {
   const { register, handleSubmit, watch, formState: { errors } } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
@@ -330,8 +332,16 @@ function EditProfileForm({ user, isPending, onSubmit }: { user: User; isPending:
   const showNiveauFields = watchRole === 'APPRENANT' || watchRole === 'MENTOR';
   const showMentorFields = watchRole === 'MENTOR';
 
+  const cleanData = (data: EditProfileFormData): EditProfileFormData => ({
+    ...data,
+    niveau: data.niveau || null,
+    serie: data.serie || null,
+    niveauResponsable: data.niveauResponsable || null,
+    serieResponsable: data.serieResponsable || null,
+  });
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit((data) => onSubmit(cleanData(data)))} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Prénom</label>
@@ -443,6 +453,9 @@ function EditProfileForm({ user, isPending, onSubmit }: { user: User; isPending:
               <option value="SECONDE">Seconde</option>
               <option value="PREMIERE">Première</option>
               <option value="TERMINALE">Terminale</option>
+              <option value="LICENCE">Licence</option>
+              <option value="MASTER">Master</option>
+              <option value="DOCTORAT">Doctorat</option>
             </select>
           </div>
         </div>
@@ -451,7 +464,7 @@ function EditProfileForm({ user, isPending, onSubmit }: { user: User; isPending:
       <div className="flex justify-end gap-3 pt-3 border-t border-gray-100 dark:border-dark-700">
         <button
           type="button"
-          onClick={() => {}}
+          onClick={onCancel}
           className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-dark-300 bg-gray-100 dark:bg-dark-700 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-600 transition-all"
         >
           Annuler
