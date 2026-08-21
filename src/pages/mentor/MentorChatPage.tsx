@@ -71,27 +71,44 @@ export default function MentorChatPage() {
     },
   });
 
-  const sendMessageMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedConv || !message.trim()) return;
-      return api.post(`/chat/conversations/${selectedConv.id}/messages`, { content: message.trim() });
-    },
-    onSuccess: () => {
-      setMessage('');
-      queryClient.invalidateQueries({ queryKey: ['chat-messages'] });
-      queryClient.invalidateQueries({ queryKey: ['chat-conversations'] });
-    },
-  });
+  // Listen for new messages via Socket.io
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
 
-  const handleSend = () => {
-    if (!message.trim() || sendMessageMutation.isPending) return;
-    sendMessageMutation.mutate();
+    const handleNewMessage = (msg: ChatMessage) => {
+      if (selectedConv && msg.conversationId === selectedConv.id) {
+        queryClient.invalidateQueries({ queryKey: ['chat-messages', selectedConv.id] });
+      }
+      queryClient.invalidateQueries({ queryKey: ['chat-conversations'] });
+    };
+
+    socket.on('new-message', handleNewMessage);
+    return () => { socket.off('new-message', handleNewMessage); };
+  }, [selectedConv, queryClient]);
+
+  // Join/leave conversation rooms
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket || !selectedConv) return;
+    socket.emit('join-conversation', selectedConv.id);
+    socket.emit('mark-read', { conversationId: selectedConv.id });
+    return () => { socket.emit('leave-conversation', selectedConv.id); };
+  }, [selectedConv]);
+
+  const sendMessage = () => {
+    if (!selectedConv || !message.trim()) return;
+    const socket = getSocket();
+    if (socket) {
+      socket.emit('send-message', { conversationId: selectedConv.id, content: message.trim() });
+    }
+    setMessage('');
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      sendMessage();
     }
   };
 
@@ -268,7 +285,7 @@ export default function MentorChatPage() {
                     rows={1}
                     placeholder="Écrire un message..."
                   />
-                  <button onClick={handleSend} disabled={!message.trim()} className="w-11 h-11 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/25 hover:from-violet-600 hover:to-violet-700 transition-all duration-200 disabled:opacity-50">
+                  <button onClick={sendMessage} disabled={!message.trim()} className="w-11 h-11 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/25 hover:from-violet-600 hover:to-violet-700 transition-all duration-200 disabled:opacity-50">
                     <span className="material-symbols-outlined">send</span>
                   </button>
                 </div>

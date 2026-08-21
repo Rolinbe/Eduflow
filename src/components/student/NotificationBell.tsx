@@ -27,7 +27,8 @@ export default function NotificationBell() {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'ADMIN';
-  const basePath = isAdmin ? '/admin' : '/apprenant';
+  const isMentor = user?.role === 'MENTOR';
+  const basePath = isAdmin ? '/admin' : isMentor ? '/mentor' : '/apprenant';
 
   const { data: notifResponse } = useQuery<{ notifications: Notification[]; unreadCount: number }>({
     queryKey: ['notifications', user?.role],

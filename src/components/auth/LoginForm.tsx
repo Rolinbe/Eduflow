@@ -30,7 +30,7 @@ export default function LoginForm() {
     try {
       await handleLogin(data.email, data.password);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Identifiants incorrects');
+      toast.error(err.response?.data?.error || err.response?.data?.message || 'Identifiants incorrects');
     } finally {
       setIsLoading(false);
     }
