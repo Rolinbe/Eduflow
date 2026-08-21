@@ -32,10 +32,20 @@ export default function CoursePlayerPage() {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'qa' | 'downloads'>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pdfModal, setPdfModal] = useState<Pdf | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastProgressRef = useRef(0);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [vidCurrentTime, setVidCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const { data: courseData, isLoading: loadingCourse } = useQuery({
     queryKey: ['cours-player', id],
@@ -116,8 +126,13 @@ export default function CoursePlayerPage() {
     const video = videoRef.current;
     if (!video) return;
 
-    const handleTimeUpdate = () => trackProgress();
+    const handleTimeUpdate = () => {
+      setVidCurrentTime(video.currentTime);
+      trackProgress();
+    };
+    const handleLoadedMetadata = () => setDuration(video.duration);
     const handleEnded = () => {
+      setIsPlaying(false);
       if (activeVideo) {
         updateVideoProgress.mutate({
           lessonId: activeVideo.id,
@@ -131,22 +146,66 @@ export default function CoursePlayerPage() {
         setCurrentVideo(videos[currentIndex + 1]);
       }
     };
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
 
     video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
     return () => {
       video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
     };
   }, [activeVideo, videos, trackProgress, updateVideoProgress]);
 
   useEffect(() => {
     lastProgressRef.current = 0;
+    setVidCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
     const video = videoRef.current;
     if (video) {
       video.load();
     }
   }, [activeVideo?.id]);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) video.play(); else video.pause();
+  };
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const video = videoRef.current;
+    const bar = progressRef.current;
+    if (!video || !bar) return;
+    const rect = bar.getBoundingClientRect();
+    video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
+  };
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return `${m}:${String(sec).padStart(2, '0')}`;
+  };
+
+  const toggleFullscreen = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (!document.fullscreenElement) { el.requestFullscreen(); setIsFullscreen(true); }
+    else { document.exitFullscreen(); setIsFullscreen(false); }
+  };
+
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
 
   if (loadingCourse) return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center">
@@ -174,19 +233,77 @@ export default function CoursePlayerPage() {
             </div>
           </div>
 
-          <div className="bg-black aspect-video max-h-[60vh] relative flex-shrink-0">
+          <div ref={containerRef} className="bg-black aspect-video max-h-[60vh] relative flex-shrink-0 group">
             {activeVideo ? (
-              <video
-                ref={videoRef}
-                key={activeVideo.id}
-                src={`/uploads/${activeVideo.url}`}
-                controls
-                autoPlay
-                className="w-full h-full object-contain"
-                poster={activeVideo.thumbnailUrl || undefined}
-              >
-                Votre navigateur ne supporte pas la lecture vidéo.
-              </video>
+              <>
+                <video
+                  ref={videoRef}
+                  key={activeVideo.id}
+                  src={`/uploads/${activeVideo.url}`}
+                  autoPlay
+                  className="w-full h-full object-contain"
+                  poster={activeVideo.thumbnailUrl || undefined}
+                  controlsList="nodownload nofullscreen noremoteplayback"
+                  disablePictureInPicture
+                  onContextMenu={(e) => e.preventDefault()}
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && ['s','u','S','U'].includes(e.key)) e.preventDefault();
+                  }}
+                >
+                  Votre navigateur ne supporte pas la lecture vidéo.
+                </video>
+
+                {/* Custom Controls */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent px-4 pb-3 pt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div
+                    ref={progressRef}
+                    onClick={handleProgressClick}
+                    className="w-full h-1.5 bg-gray-600 rounded-full cursor-pointer mb-3 group/progress hover:h-2.5 transition-all"
+                  >
+                    <div
+                      className="h-full bg-gradient-to-r from-primary-500 to-primary-400 rounded-full relative"
+                      style={{ width: `${duration > 0 ? (vidCurrentTime / duration) * 100 : 0}%` }}
+                    >
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-primary-500 rounded-full shadow-lg opacity-0 group-hover/progress:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <button onClick={togglePlay} className="text-white hover:text-primary-400 transition-colors">
+                        <span className="material-symbols-outlined text-2xl">{isPlaying ? 'pause' : 'play_arrow'}</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          const v = videoRef.current;
+                          if (v) { v.muted = !v.muted; setIsMuted(!isMuted); }
+                        }}
+                        className="text-white hover:text-primary-400 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-xl">
+                          {isMuted || volume === 0 ? 'volume_off' : volume < 0.5 ? 'volume_down' : 'volume_up'}
+                        </span>
+                      </button>
+                      {!isMuted && (
+                        <input
+                          type="range" min="0" max="1" step="0.05" value={volume}
+                          onChange={(e) => {
+                            const v = parseFloat(e.target.value);
+                            setVolume(v);
+                            if (videoRef.current) { videoRef.current.volume = v; }
+                          }}
+                          className="w-20 accent-primary-500"
+                        />
+                      )}
+                      <span className="text-white/70 text-xs font-mono">
+                        {formatTime(vidCurrentTime)} / {formatTime(duration)}
+                      </span>
+                    </div>
+                    <button onClick={toggleFullscreen} className="text-white hover:text-primary-400 transition-colors">
+                      <span className="material-symbols-outlined text-xl">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
+                    </button>
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <p className="text-white/50">Aucune vidéo disponible</p>
@@ -208,7 +325,7 @@ export default function CoursePlayerPage() {
               {[
                 { key: 'overview', label: 'Aperçu', icon: 'info' },
                 { key: 'qa', label: 'Q&A', icon: 'question_answer' },
-                { key: 'downloads', label: 'Documents', icon: 'download' },
+                { key: 'downloads', label: 'Documents', icon: 'description' },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -242,7 +359,14 @@ export default function CoursePlayerPage() {
               {activeTab === 'downloads' && (
                 <div className="space-y-3">
                   {pdfs.map((pdf) => (
-                    <div key={pdf.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                    <button
+                      key={pdf.id}
+                      onClick={() => {
+                        setPdfModal(pdf);
+                        updatePdfProgress.mutate(pdf.id);
+                      }}
+                      className="w-full flex items-center justify-between p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                    >
                       <div className="flex items-center gap-3">
                         <span className="material-symbols-outlined text-xl text-red-500">picture_as_pdf</span>
                         <div>
@@ -250,16 +374,11 @@ export default function CoursePlayerPage() {
                           {pdf.description && <p className="text-xs text-gray-400">{pdf.description}</p>}
                         </div>
                       </div>
-                      <a
-                        href={`/uploads/${pdf.url}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-200 transition-colors"
-                      >
-                        <span className="material-symbols-outlined text-sm">download</span>
-                        Télécharger
-                      </a>
-                    </div>
+                      <span className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-lg">
+                        <span className="material-symbols-outlined text-sm">visibility</span>
+                        Consulter
+                      </span>
+                    </button>
                   ))}
                   {pdfs.length === 0 && (
                     <p className="text-sm text-gray-400 text-center py-4">Aucun document disponible</p>
@@ -337,12 +456,10 @@ export default function CoursePlayerPage() {
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 py-2">Documents</p>
                 <div className="space-y-0.5">
                   {pdfs.map((pdf) => (
-                    <a
+                    <button
                       key={pdf.id}
-                      href={`/uploads/${pdf.url}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
+                      onClick={() => { setPdfModal(pdf); updatePdfProgress.mutate(pdf.id); }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors text-left"
                     >
                       <span className="material-symbols-outlined text-lg text-red-400">picture_as_pdf</span>
                       <div className="flex-1 min-w-0">
@@ -351,7 +468,8 @@ export default function CoursePlayerPage() {
                           {pdf.pageCount > 0 ? `${pdf.pageCount} pages` : ''}
                         </p>
                       </div>
-                    </a>
+                      <span className="material-symbols-outlined text-sm text-gray-500">visibility</span>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -359,6 +477,33 @@ export default function CoursePlayerPage() {
           </div>
         </div>
       </div>
+
+      {/* PDF Modal - Visionneuse inline */}
+      {pdfModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setPdfModal(null)}>
+          <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-dark-600">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-xl text-red-500">picture_as_pdf</span>
+                <div>
+                  <h3 className="font-bold text-gray-900 dark:text-white">{pdfModal.title}</h3>
+                  {pdfModal.description && <p className="text-xs text-gray-500 dark:text-dark-400">{pdfModal.description}</p>}
+                </div>
+              </div>
+              <button onClick={() => setPdfModal(null)} className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700 transition-colors">
+                <span className="material-symbols-outlined text-gray-500 dark:text-dark-400">close</span>
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <iframe
+                src={`/uploads/${pdfModal.url}#toolbar=0&navpanes=0&scrollbar=0`}
+                className="w-full h-full border-0"
+                title={pdfModal.title}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -19,6 +19,19 @@ const niveauLabels: Record<string, string> = {
   SECONDE: 'Seconde', PREMIERE: 'Première', TERMINALE: 'Terminale',
 };
 
+const editProfileSchema = z.object({
+  firstName: z.string().min(2, 'Le prénom doit contenir au moins 2 caractères'),
+  lastName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  email: z.string().email('Email invalide'),
+  role: z.enum(['ADMIN', 'APPRENANT', 'MENTOR']),
+  niveau: z.enum(['SIXIEME', 'CINQUIEME', 'QUATRIEME', 'TROISIEME', 'SECONDE', 'PREMIERE', 'TERMINALE']).nullable().optional(),
+  serie: z.enum(['S', 'L', 'OSE']).nullable().optional(),
+  niveauResponsable: z.enum(['SIXIEME', 'CINQUIEME', 'QUATRIEME', 'TROISIEME', 'SECONDE', 'PREMIERE', 'TERMINALE']).nullable().optional(),
+  serieResponsable: z.enum(['S', 'L', 'OSE']).nullable().optional(),
+});
+
+type EditProfileFormData = z.infer<typeof editProfileSchema>;
+
 export default function UserManagementPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -27,6 +40,7 @@ export default function UserManagementPage() {
   const [showProgressModal, setShowProgressModal] = useState<User | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
   const [resetPasswordTarget, setResetPasswordTarget] = useState<User | null>(null);
+  const [editTarget, setEditTarget] = useState<User | null>(null);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -72,12 +86,32 @@ export default function UserManagementPage() {
     onError: (err: any) => toast.error(err.response?.data?.error || 'Erreur'),
   });
 
+  const editProfileMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: EditProfileFormData }) =>
+      api.put(`/admin/users/${id}/profile`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      toast.success('Profil mis à jour avec succès');
+      setEditTarget(null);
+    },
+    onError: (err: any) => toast.error(err.response?.data?.error || 'Erreur'),
+  });
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIF': return <Badge variant="success">Actif</Badge>;
       case 'INACTIF': return <Badge variant="gray">Inactif</Badge>;
       case 'BLOQUE': return <Badge variant="danger">Bloqué</Badge>;
       default: return <Badge variant="gray">{status}</Badge>;
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'ADMIN': return <Badge variant="primary">Admin</Badge>;
+      case 'MENTOR': return <Badge variant="warning">Mentor</Badge>;
+      case 'APPRENANT': return <Badge variant="info">Apprenant</Badge>;
+      default: return <Badge variant="gray">{role}</Badge>;
     }
   };
 
@@ -102,11 +136,7 @@ export default function UserManagementPage() {
     {
       key: 'role',
       header: 'Rôle',
-      render: (item: User) => (
-        <Badge variant={item.role === 'ADMIN' ? 'primary' : 'info'}>
-          {item.role === 'ADMIN' ? 'Admin' : 'Apprenant'}
-        </Badge>
-      ),
+      render: (item: User) => getRoleBadge(item.role),
     },
     {
       key: 'status',
@@ -119,7 +149,7 @@ export default function UserManagementPage() {
       render: (item: User) => {
         if (!item.niveau) return <span className="text-xs text-gray-400 dark:text-dark-400">-</span>;
         const label = niveauLabels[item.niveau] || item.niveau;
-        const serie = item.niveau === 'TERMINALE' && item.serie ? ` ${item.serie}` : '';
+        const serie = (item.niveau === 'PREMIERE' || item.niveau === 'TERMINALE') && item.serie ? ` ${item.serie}` : '';
         return <Badge variant="info">{label}{serie}</Badge>;
       },
     },
@@ -136,25 +166,20 @@ export default function UserManagementPage() {
       key: 'actions',
       header: '',
       render: (item: User) => (
-        item.role === 'ADMIN' ? (
-          <div className="flex items-center gap-3">
-            <Badge variant="primary">Admin</Badge>
-          </div>
-        ) : (
-          <DropdownMenu
-            items={[
-              { label: 'Voir la progression', icon: 'bar_chart', onClick: () => setShowProgressModal(item) },
-              { label: 'Réinitialiser le mot de passe', icon: 'lock_reset', onClick: () => setResetPasswordTarget(item), variant: 'warning' },
-              { label: item.status === 'ACTIF' ? 'Désactiver' : 'Activer', icon: item.status === 'ACTIF' ? 'person_off' : 'person', onClick: () => {
-                const newStatus = item.status === 'ACTIF' ? 'INACTIF' : 'ACTIF';
-                statusMutation.mutate({ id: item.id, status: newStatus });
-              }},
-              ...(item.status === 'BLOQUE' ? [{ label: 'Débloquer', icon: 'lock_open', onClick: () => statusMutation.mutate({ id: item.id, status: 'ACTIF' }), variant: 'success' as const }] : []),
-              ...(item.status !== 'BLOQUE' ? [{ label: 'Bloquer', icon: 'block', onClick: () => statusMutation.mutate({ id: item.id, status: 'BLOQUE' }), variant: 'danger' as const }] : []),
-              { label: 'Supprimer', icon: 'delete', onClick: () => setDeleteTarget(item), variant: 'danger' },
-            ]}
-          />
-        )
+        <DropdownMenu
+          items={[
+            { label: 'Modifier le profil', icon: 'edit', onClick: () => setEditTarget(item) },
+            { label: 'Voir la progression', icon: 'bar_chart', onClick: () => setShowProgressModal(item) },
+            { label: 'Réinitialiser le mot de passe', icon: 'lock_reset', onClick: () => setResetPasswordTarget(item), variant: 'warning' },
+            { label: item.status === 'ACTIF' ? 'Désactiver' : 'Activer', icon: item.status === 'ACTIF' ? 'person_off' : 'person', onClick: () => {
+              const newStatus = item.status === 'ACTIF' ? 'INACTIF' : 'ACTIF';
+              statusMutation.mutate({ id: item.id, status: newStatus });
+            }},
+            ...(item.status === 'BLOQUE' ? [{ label: 'Débloquer', icon: 'lock_open', onClick: () => statusMutation.mutate({ id: item.id, status: 'ACTIF' }), variant: 'success' as const }] : []),
+            ...(item.status !== 'BLOQUE' ? [{ label: 'Bloquer', icon: 'block', onClick: () => statusMutation.mutate({ id: item.id, status: 'BLOQUE' }), variant: 'danger' as const }] : []),
+            ...(item.role !== 'ADMIN' ? [{ label: 'Supprimer', icon: 'delete', onClick: () => setDeleteTarget(item), variant: 'danger' as const }] : []),
+          ]}
+        />
       ),
     },
   ];
@@ -180,6 +205,7 @@ export default function UserManagementPage() {
           >
             <option value="">Tous les rôles</option>
             <option value="ADMIN">Admin</option>
+            <option value="MENTOR">Mentor</option>
             <option value="APPRENANT">Apprenant</option>
           </select>
           <select
@@ -208,6 +234,22 @@ export default function UserManagementPage() {
           emptyMessage="Aucun utilisateur trouvé"
         />
       )}
+
+      {/* Edit Profile Modal */}
+      <Modal
+        isOpen={!!editTarget}
+        onClose={() => setEditTarget(null)}
+        title={`Modifier le profil — ${editTarget?.firstName} ${editTarget?.lastName}`}
+        size="lg"
+      >
+        {editTarget && (
+          <EditProfileForm
+            user={editTarget}
+            isPending={editProfileMutation.isPending}
+            onSubmit={(formData) => editProfileMutation.mutate({ id: editTarget.id, data: formData })}
+          />
+        )}
+      </Modal>
 
       <Modal
         isOpen={!!showProgressModal}
@@ -264,6 +306,165 @@ export default function UserManagementPage() {
         />
       </Modal>
     </AdminLayout>
+  );
+}
+
+function EditProfileForm({ user, isPending, onSubmit }: { user: User; isPending: boolean; onSubmit: (data: EditProfileFormData) => void }) {
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<EditProfileFormData>({
+    resolver: zodResolver(editProfileSchema),
+    defaultValues: {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      niveau: user.niveau || null,
+      serie: user.serie || null,
+      niveauResponsable: user.niveauResponsable || null,
+      serieResponsable: user.serieResponsable || null,
+    },
+  });
+
+  const watchRole = watch('role');
+  const watchNiveau = watch('niveau');
+  const showSerie = watchNiveau === 'PREMIERE' || watchNiveau === 'TERMINALE';
+  const showNiveauFields = watchRole === 'APPRENANT' || watchRole === 'MENTOR';
+  const showMentorFields = watchRole === 'MENTOR';
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Prénom</label>
+          <input
+            type="text"
+            {...register('firstName')}
+            className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+          />
+          {errors.firstName && <p className="text-xs text-red-500 mt-1">{errors.firstName.message}</p>}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Nom</label>
+          <input
+            type="text"
+            {...register('lastName')}
+            className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+          />
+          {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName.message}</p>}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Email</label>
+        <input
+          type="email"
+          {...register('email')}
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+        />
+        {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Rôle</label>
+        <select
+          {...register('role')}
+          className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+        >
+          <option value="APPRENANT">Apprenant</option>
+          <option value="MENTOR">Mentor</option>
+          <option value="ADMIN">Admin</option>
+        </select>
+        {errors.role && <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>}
+      </div>
+
+      {showNiveauFields && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">
+              {showMentorFields ? 'Niveau responsable' : 'Niveau'}
+            </label>
+            <select
+              {...register(showMentorFields ? 'niveauResponsable' : 'niveau')}
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+            >
+              <option value="">Aucun</option>
+              <option value="SIXIEME">6ème</option>
+              <option value="CINQUIEME">5ème</option>
+              <option value="QUATRIEME">4ème</option>
+              <option value="TROISIEME">3ème</option>
+              <option value="SECONDE">Seconde</option>
+              <option value="PREMIERE">Première</option>
+              <option value="TERMINALE">Terminale</option>
+            </select>
+          </div>
+          {showMentorFields && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Série responsable</label>
+              <select
+                {...register('serieResponsable')}
+                className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+              >
+                <option value="">Aucune</option>
+                <option value="S">Série S</option>
+                <option value="L">Série L</option>
+                <option value="OSE">Série OSE</option>
+              </select>
+            </div>
+          )}
+          {!showMentorFields && showSerie && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Série</label>
+              <select
+                {...register('serie')}
+                className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+              >
+                <option value="">Aucune</option>
+                <option value="S">Série S</option>
+                <option value="L">Série L</option>
+                <option value="OSE">Série OSE</option>
+              </select>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showMentorFields && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-200 mb-1">Niveau (personnel)</label>
+            <select
+              {...register('niveau')}
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-dark-800 dark:text-white transition-all"
+            >
+              <option value="">Aucun</option>
+              <option value="SIXIEME">6ème</option>
+              <option value="CINQUIEME">5ème</option>
+              <option value="QUATRIEME">4ème</option>
+              <option value="TROISIEME">3ème</option>
+              <option value="SECONDE">Seconde</option>
+              <option value="PREMIERE">Première</option>
+              <option value="TERMINALE">Terminale</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-end gap-3 pt-3 border-t border-gray-100 dark:border-dark-700">
+        <button
+          type="button"
+          onClick={() => {}}
+          className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-dark-300 bg-gray-100 dark:bg-dark-700 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-600 transition-all"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-all disabled:opacity-50"
+        >
+          {isPending ? 'Enregistrement...' : 'Enregistrer'}
+        </button>
+      </div>
+    </form>
   );
 }
 

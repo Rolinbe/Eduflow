@@ -88,9 +88,11 @@ export default function CourseContent({ coursId, currentVideoId, onVideoSelect }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 py-2 text-sm text-gray-600 hover:text-primary-600 transition-colors"
+                onClick={(e) => e.preventDefault()}
               >
-                <span className="material-symbols-outlined text-lg text-danger">picture_as_pdf</span>
+                <span className="material-symbols-outlined text-lg text-red-400">picture_as_pdf</span>
                 <span className="truncate">{pdf.title}</span>
+                <span className="material-symbols-outlined text-sm text-gray-400 ml-auto">visibility</span>
               </a>
             ))}
           </div>
