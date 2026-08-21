@@ -20,11 +20,9 @@ export function useAuth() {
     navigate(getHomePath(res.data.user.role));
   };
 
-  const handleRegister = async (data: { firstName: string; lastName: string; email: string; password: string; role?: string; niveau?: string; serie?: string; niveauResponsable?: string; serieResponsable?: string }) => {
+  const handleRegister = async (data: { firstName: string; lastName: string; email?: string; password: string; role?: string; niveau?: string; serie?: string; niveauResponsable?: string; serieResponsable?: string }) => {
     const res = await api.post('/auth/register', data);
-    login(res.data.user, res.data.token, res.data.refreshToken);
-    toast.success('Compte créé avec succès!');
-    navigate(getHomePath(res.data.user.role));
+    return res.data;
   };
 
   const handleLogout = async () => {
