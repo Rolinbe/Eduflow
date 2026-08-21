@@ -12,6 +12,8 @@ export default function MentorChatPage() {
   const [searchParams] = useSearchParams();
   const targetStudentId = searchParams.get('student');
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
+  const [showNewConv, setShowNewConv] = useState(false);
+  const [studentSearch, setStudentSearch] = useState('');
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
@@ -99,44 +101,119 @@ export default function MentorChatPage() {
         <div className="flex h-full">
           {/* Conversations list */}
           <div className={`w-80 border-r border-gray-100 dark:border-dark-700 flex flex-col ${selectedConv ? 'hidden md:flex' : 'flex'}`}>
-            <div className="p-4 border-b border-gray-100 dark:border-dark-700">
-              <h3 className="font-bold text-gray-900 dark:text-white">Conversations</h3>
+            <div className="p-4 border-b border-gray-100 dark:border-dark-700 flex items-center justify-between">
+              {showNewConv ? (
+                <>
+                  <button onClick={() => { setShowNewConv(false); setStudentSearch(''); }} className="flex items-center gap-1 text-sm font-semibold text-gray-500 dark:text-dark-400 hover:text-gray-700 dark:hover:text-dark-200 transition-colors">
+                    <span className="material-symbols-outlined text-lg">arrow_back</span>
+                    Retour
+                  </button>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-sm">Nouvelle conversation</h3>
+                </>
+              ) : (
+                <>
+                  <h3 className="font-bold text-gray-900 dark:text-white">Conversations</h3>
+                  <button onClick={() => setShowNewConv(true)} className="w-8 h-8 flex items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-all duration-200" title="Nouvelle conversation">
+                    <span className="material-symbols-outlined text-lg">edit</span>
+                  </button>
+                </>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto">
-              {conversations.length > 0 ? (
-                conversations.map((conv) => (
-                  <button
-                    key={conv.id}
-                    onClick={() => setSelectedConv(conv)}
-                    className={`w-full flex items-center gap-3 p-4 transition-all duration-200 text-left ${
-                      selectedConv?.id === conv.id
-                        ? 'bg-violet-50 dark:bg-violet-900/20'
-                        : 'hover:bg-gray-50 dark:hover:bg-dark-700'
-                    }`}
-                  >
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                      <span className="text-sm font-bold text-white">
-                        {conv.otherUser?.firstName?.[0]}{conv.otherUser?.lastName?.[0]}
-                      </span>
+              {showNewConv ? (
+                <>
+                  <div className="p-3">
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-lg">search</span>
+                      <input
+                        type="text"
+                        value={studentSearch}
+                        onChange={(e) => setStudentSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-dark-600 rounded-xl text-sm bg-gray-50 dark:bg-dark-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all duration-200"
+                        placeholder="Rechercher un élève..."
+                      />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                        {conv.otherUser?.firstName} {conv.otherUser?.lastName}
-                      </p>
-                      {conv.lastMessage && (
-                        <p className="text-xs text-gray-400 dark:text-dark-400 truncate">{conv.lastMessage.content}</p>
-                      )}
-                    </div>
-                    {conv.unreadCount > 0 && (
-                      <span className="w-5 h-5 bg-violet-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{conv.unreadCount}</span>
+                  </div>
+                  <div className="space-y-0.5 px-2">
+                    {(studentsData || [])
+                      .filter((s: any) => {
+                        if (!studentSearch.trim()) return true;
+                        const q = studentSearch.toLowerCase();
+                        return `${s.firstName} ${s.lastName}`.toLowerCase().includes(q) || s.email?.toLowerCase().includes(q);
+                      })
+                      .map((student: any) => (
+                        <button
+                          key={student.id}
+                          onClick={() => {
+                            createConvMutation.mutate(student.id);
+                            setShowNewConv(false);
+                            setStudentSearch('');
+                          }}
+                          disabled={createConvMutation.isPending}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all duration-200 text-left disabled:opacity-50"
+                        >
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                            <span className="text-sm font-bold text-white">
+                              {student.firstName?.[0]}{student.lastName?.[0]}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{student.firstName} {student.lastName}</p>
+                            <p className="text-xs text-gray-400 dark:text-dark-400 truncate">{student.email}</p>
+                          </div>
+                          <span className="material-symbols-outlined text-lg text-gray-300 dark:text-dark-500">chat</span>
+                        </button>
+                      ))}
+                    {studentsData && studentsData.filter((s: any) => {
+                      if (!studentSearch.trim()) return true;
+                      const q = studentSearch.toLowerCase();
+                      return `${s.firstName} ${s.lastName}`.toLowerCase().includes(q) || s.email?.toLowerCase().includes(q);
+                    }).length === 0 && (
+                      <div className="text-center py-8">
+                        <span className="material-symbols-outlined text-4xl text-gray-300 dark:text-dark-500">person_search</span>
+                        <p className="text-sm text-gray-400 dark:text-dark-400 mt-2">Aucun élève trouvé</p>
+                      </div>
                     )}
-                  </button>
-                ))
+                  </div>
+                </>
               ) : (
-                <div className="text-center py-8">
-                  <span className="material-symbols-outlined text-4xl text-gray-300 dark:text-dark-500">chat</span>
-                  <p className="text-sm text-gray-400 dark:text-dark-400 mt-2">Aucune conversation</p>
-                </div>
+                <>
+                  {conversations.length > 0 ? (
+                    conversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => setSelectedConv(conv)}
+                        className={`w-full flex items-center gap-3 p-4 transition-all duration-200 text-left ${
+                          selectedConv?.id === conv.id
+                            ? 'bg-violet-50 dark:bg-violet-900/20'
+                            : 'hover:bg-gray-50 dark:hover:bg-dark-700'
+                        }`}
+                      >
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                          <span className="text-sm font-bold text-white">
+                            {conv.otherUser?.firstName?.[0]}{conv.otherUser?.lastName?.[0]}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                            {conv.otherUser?.firstName} {conv.otherUser?.lastName}
+                          </p>
+                          {conv.lastMessage && (
+                            <p className="text-xs text-gray-400 dark:text-dark-400 truncate">{conv.lastMessage.content}</p>
+                          )}
+                        </div>
+                        {conv.unreadCount > 0 && (
+                          <span className="w-5 h-5 bg-violet-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{conv.unreadCount}</span>
+                        )}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <span className="material-symbols-outlined text-4xl text-gray-300 dark:text-dark-500">chat</span>
+                      <p className="text-sm text-gray-400 dark:text-dark-400 mt-2">Aucune conversation</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

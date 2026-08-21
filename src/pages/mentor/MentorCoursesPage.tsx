@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../services/api';
 import MentorLayout from '../../components/layout/MentorLayout';
+import MentorContentManager from '../../components/mentor/MentorContentManager';
 import Modal from '../../components/ui/Modal';
 import Badge from '../../components/ui/Badge';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -20,6 +21,7 @@ export default function MentorCoursesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Cours | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Cours | null>(null);
+  const [showContentModal, setShowContentModal] = useState<Cours | null>(null);
   const [formTitle, setFormTitle] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formNiveau, setFormNiveau] = useState('');
@@ -174,7 +176,11 @@ export default function MentorCoursesPage() {
                         </span>
                       </div>
                       <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-dark-700">
-                        <button onClick={() => openEdit(course)} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-all duration-200">
+                        <button onClick={() => setShowContentModal(course)} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20 rounded-xl hover:bg-violet-100 dark:hover:bg-violet-900/30 transition-all duration-200">
+                          <span className="material-symbols-outlined text-sm">upload_file</span>
+                          Gérer
+                        </button>
+                        <button onClick={() => openEdit(course)} className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold text-gray-600 dark:text-dark-300 bg-gray-50 dark:bg-dark-700 rounded-xl hover:bg-gray-100 dark:hover:bg-dark-600 transition-all duration-200">
                           <span className="material-symbols-outlined text-sm">edit</span>
                           Modifier
                         </button>
@@ -233,6 +239,12 @@ export default function MentorCoursesPage() {
                           <span className="material-symbols-outlined text-sm text-emerald-500">people</span>
                           <span className="font-medium">{course._count?.enrollments || 0}</span>
                         </span>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-dark-700">
+                        <button onClick={() => setShowContentModal(course)} className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200">
+                          <span className="material-symbols-outlined text-sm">upload_file</span>
+                          Accéder et gérer le contenu
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -299,6 +311,13 @@ export default function MentorCoursesPage() {
             </button>
           </div>
         </div>
+      </Modal>
+
+      {/* Content Manager Modal */}
+      <Modal isOpen={!!showContentModal} onClose={() => setShowContentModal(null)} title={`Gérer le contenu : ${showContentModal?.title || ''}`} size="xl">
+        {showContentModal && (
+          <MentorContentManager coursId={showContentModal.id} onSuccess={() => queryClient.invalidateQueries({ queryKey: ['mentor-courses'] })} />
+        )}
       </Modal>
     </MentorLayout>
   );
