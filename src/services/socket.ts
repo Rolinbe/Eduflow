@@ -6,9 +6,16 @@ let socket: Socket | null = null;
 export function getSocket(): Socket {
   if (!socket) {
     const token = useAuthStore.getState().token;
-    socket = io(window.location.origin, {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const url = apiUrl ? apiUrl.replace('/api', '') : window.location.origin;
+
+    socket = io(url, {
       auth: { token },
       transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 2000,
+      timeout: 5000,
     });
 
     socket.on('connect', () => {
@@ -16,7 +23,7 @@ export function getSocket(): Socket {
     });
 
     socket.on('connect_error', (err) => {
-      console.error('Socket connection error:', err.message);
+      console.warn('⚠️ Socket indisponible (mode Vercel/production):', err.message);
     });
   }
   return socket;
